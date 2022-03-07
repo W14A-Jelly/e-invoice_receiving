@@ -1,7 +1,7 @@
 # Sprint 2 #
 
 
-## Black box API Tests: 7/3/22 -> 9/3/22 ##
+## Black box HTTP Tests: 7/3/22 -> 9/3/22 ##
 
 Zijie: user register, user logout , user login
 
