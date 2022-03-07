@@ -11,7 +11,7 @@ Kian: update email, update username, update password
 
 Elise: output report, set receive email, clear
 
-## Implementation: 9/3/22 -> 11/3/22 ##
+## Implementation: 7/3/22 -> 11/3/22 ##
 
 Zijie: retriever, end retrieve, validation
 
