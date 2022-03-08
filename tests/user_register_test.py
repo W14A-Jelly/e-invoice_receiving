@@ -12,14 +12,14 @@ def register_successful(clear):
         'password' : 'password',
         'user_name' : 'HarryMan',
     }
-    response = requests.post(f"{URL}/auth/register/v2", json = request_body)
+    response = requests.post(f"{URL}/user/register", json = request_body)
     assert response.status_code == 200
     request_body = {
         'email' : 'Goodhi@gmail.com',
         'password' : 'password',
         'user_name' : 'HarryWoman',
     }
-    response1 = requests.post(f"{URL}/auth/register/v2", json = request_body)
+    response1 = requests.post(f"{URL}/user/register", json = request_body)
     assert response1.status_code == 200
 
     assert response.json()['token'] != response1.json()['token']
@@ -30,7 +30,7 @@ def test_register_email_invalid(clear):
         'password' : 'password',
         'user_name' : 'HarryMan1',
     }
-    response = requests.post(f"{URL}/auth/register/v2", json = request_body)
+    response = requests.post(f"{URL}/user/register", json = request_body)
     assert response.status_code == 400
 
     request_body = {
@@ -38,7 +38,7 @@ def test_register_email_invalid(clear):
         'password' : 'password',
         'user_name' : 'HarryMan2',
     }
-    response = requests.post(f"{URL}/auth/register/v2", json = request_body)
+    response = requests.post(f"{URL}/user/register", json = request_body)
     assert response.status_code == 400
 
     request_body = {
@@ -46,7 +46,7 @@ def test_register_email_invalid(clear):
         'password' : 'password',
         'user_name' : 'HarryMan3',
     }
-    response = requests.post(f"{URL}/auth/register/v2", json = request_body)
+    response = requests.post(f"{URL}/user/register", json = request_body)
     assert response.status_code == 400
 
 def test_register_duplicate_email(clear):
@@ -55,13 +55,13 @@ def test_register_duplicate_email(clear):
         'password' : 'password',
         'user_name' : 'HarryMan',
     }
-    response = requests.post(f"{URL}/auth/register/v2", json = request_body)
+    response = requests.post(f"{URL}/user/register", json = request_body)
     request_body = {
         'email' : 'Hello@gmail.com',
         'password' : 'password',
         'user_name' : 'HarryMan1',
     }
-    response = requests.post(f"{URL}/auth/register/v2", json = request_body)
+    response = requests.post(f"{URL}/user/register", json = request_body)
     
     assert response.status_code == 400
 
@@ -72,13 +72,13 @@ def test_register_duplicate_username(clear):
         'password' : 'password',
         'user_name' : 'HarryMan',
     }
-    response = requests.post(f"{URL}/auth/register/v2", json = request_body)
+    response = requests.post(f"{URL}/user/register", json = request_body)
     request_body = {
         'email' : 'Hello1@gmail.com',
         'password' : 'password',
         'user_name' : 'HarryMan',
     }
-    response = requests.post(f"{URL}/auth/register/v2", json = request_body)
+    response = requests.post(f"{URL}/user/register", json = request_body)
     
     assert response.status_code == 400
 
@@ -92,7 +92,7 @@ def test_register_duplicate_username_invalid(clear):
         'password' : 'password',
         'user_name' : 'a'*22,
     }
-    response = requests.post(f"{URL}/auth/register/v2", json = request_body)
+    response = requests.post(f"{URL}/user/register", json = request_body)
     assert response.status_code == 400
 
     request_body = {
@@ -100,7 +100,7 @@ def test_register_duplicate_username_invalid(clear):
         'password' : 'password',
         'user_name' : 'aa',
     }
-    response = requests.post(f"{URL}/auth/register/v2", json = request_body)
+    response = requests.post(f"{URL}/user/register", json = request_body)
     assert response.status_code == 400.
 
 def test_register_username_edgecase():
@@ -112,7 +112,7 @@ def test_register_username_edgecase():
         'password' : 'password',
         'user_name' : 'a'*20,
     }
-    response = requests.post(f"{URL}/auth/register/v2", json = request_body)
+    response = requests.post(f"{URL}/user/register", json = request_body)
     assert response.status_code == 400
 
     request_body = {
@@ -120,6 +120,6 @@ def test_register_username_edgecase():
         'password' : 'password',
         'user_name' : 'a'*6,
     }
-    response = requests.post(f"{URL}/auth/register/v2", json = request_body)
+    response = requests.post(f"{URL}/user/register", json = request_body)
     assert response.status_code == 400.
 
