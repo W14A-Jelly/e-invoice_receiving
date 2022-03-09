@@ -1,14 +1,20 @@
-import pytest
 import requests
-import json
+import pytest
 from src import config
 
 URL = f'http://127.0.0.1:{config.port}'
 
 @pytest.fixture
+def clear():
+    '''
+    Clears database data
+    '''
+    requests.delete(f"{URL}/clear")
+
+@pytest.fixture
 def user_1():
     '''
-    Register 1st user with a valid email for invoice retrieval 
+    Register 1st user with a valid email for invoice retrieval
     '''
     valid_email = 'einvoice.retrieve@gmail.com'
     email_pass = 'retrieve@jelly'
@@ -35,7 +41,7 @@ def user_1():
 @pytest.fixture
 def user_2():
     '''
-    Register 2nd user with a valid email for invoice retrieval 
+    Register 2nd user with a valid email for invoice retrieval
     '''
     valid_email = 'einvoice.retrieve2@outlook.com'
     email_pass = 'retrieve2@jelly'
