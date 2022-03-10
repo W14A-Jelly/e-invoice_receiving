@@ -12,7 +12,6 @@ def test_help_create_user():
     request_body = {
         'email' : 'Good@gmail.com',
         'password' : 'password',
-        'user_name' : 'HarryMan',
     }
     response = requests.post(f"{URL}/user/register", json = request_body)
     assert response.status_code == 200
@@ -20,7 +19,7 @@ def test_help_create_user():
 def test_successful_login():
     request_body = {
         'password' : 'password',
-        'user_name' : 'HarryMan',
+        'email' : 'Good@gmail.com',
     }
     response1 = requests.post(f"{URL}/user/login", json = request_body)
     response2 = requests.post(f"{URL}/user/login", json = request_body)
@@ -28,13 +27,13 @@ def test_successful_login():
     assert response2.status_code == 200
     assert response1.json()['token'] != response2.json()['token']
 
-def test_username_not_exist():
+def test_email_not_exist():
     '''
-    Test the case where the user name is not registerd
+    Test the case where the email is not registerd
     '''
     request_body = {
         'password' : 'password',
-        'user_name' : 'Notexist',
+        'email' : 'Notexist@gmail.com',
     }
     response = requests.post(f"{URL}/user/login", json = request_body)
     assert response.status_code == 400
@@ -45,7 +44,7 @@ def test_pass_nomatch():
     '''
     request_body = {
         'password' : 'Iforgotit',
-        'user_name' : 'HarryMan',
+        'email' : 'Good@gmail.com',
     }
     response = requests.post(f"{URL}/user/login", json = request_body)
     assert response.status_code == 400
