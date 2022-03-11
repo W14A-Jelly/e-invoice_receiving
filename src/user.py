@@ -1,5 +1,7 @@
+from numpy import full
 from src.error import InputError, AccessError
-from database import Database
+from src.database import Database
+from re import fullmatch, regex
 
 def user_register(user_name, password, email_address):
     '''
@@ -21,8 +23,31 @@ def user_logout(token):
 
 def user_update_email(token, email):
     '''
-    some description
+    Change pre-existing email to the the given email.
+
+    Arguments:
+        token (string) - An encoded string.
+        email (string) - Valid email structure with @.
+
+    Exceptions:
+        AccessError: Invalid token.
+        InputError: Invalid email format, Email address already used.
+
+    Return Value:
+        Returns an empty dictionary on successful request.
     '''
+    # TODO Get user_id
+    if token == 'not valid':
+        return AccessError('Invalid token')
+    elif fullmatch(regex, email) == None:
+        return InputError('Invalid email format')
+
+    all_email = [user.email for user in Database.get('Login', token.user_id)]
+    if email in all_email:
+        raise InputError('Email address already used')
+        
+    Database.update('Login', token.user_id, {'email' : email})
+
     return {}
 
 def user_update_username(token, user_name):
