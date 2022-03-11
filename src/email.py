@@ -74,6 +74,7 @@ def help_check_inbox(email_address, password,timestamp,user_id ):
         #DATABASE select is retrieve from email retrieve where email = email_address
     mail.close()
     mail.logout()
+    #TODO: call report output and give successful_invoice to it
 
 
 
