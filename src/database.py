@@ -1,4 +1,5 @@
-from schema import db, Login, Email, Ownership
+from sqlite3 import Row
+from src.schema import db, Login, Email, Ownership
 
 '''
 Database class to manipulate table data and connect to SQLite server
@@ -20,6 +21,13 @@ Usecase:
                                 'user_id' : 0})
     Database.update('Login', 0, {'password' :'newpassword',
                                     'email' : 'new@gmail.com'})
+    print(Database.get('Login', 0)[0].email) # Would print 'new@gmail.com'
+
+    Database.insert('Ownership', {'user_id':0, 'xml_id':123})
+    Database.insert('Ownership', {'user_id':0, 'xml_id':234})
+    print(Database.get('Ownership', 0)[0].xml_id) # Would print 123
+    print(Database.get('Ownership', 0)[1].xml_id) # Would print 234
+
     Database.close()
 '''
 
@@ -59,10 +67,16 @@ class Database:
         table = find_table(table)
         table.update(data).where(table.user_id==id).execute()
 
+    def get(table, id):
+        # Returns a list of rows in a table with given user_id
+        table = find_table(table)
+        query = table.select().where(table.user_id==id).order_by(table.user_id)
+        return [row for row in query]
+
     def num_rows(table):
         # Return the number of records in a table
         table = find_table(table)
-        return(table.select().count())
+        return table.select().count()
 
     def print_table(table):
         # For debugging purposes
@@ -109,9 +123,11 @@ if __name__ == "__main__":
                             'user_id' : 0}
     '''
     #Database.insert('Login', login_data)
-    #Database.insert('Ownership', {'user_id':0, 'xml_id':123})
+    #Database.insert('Ownership', {'user_id':0, 'xml_id':2})
+    #Database.insert('Ownership', {'user_id':0, 'xml_id':1})
     #data = {'password' :'password', 'email' : 'new2@gmail.com'}
     #Database.update('Login', 0, data)
     #Database.drop_tables()
-    #Database.print_table('Login')
+    #print(Database.get('Ownership', 0)[0].xml_id)
+    #Database.print_table('Ownership')
     #Database.stop()
