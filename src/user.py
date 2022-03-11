@@ -1,4 +1,3 @@
-from numpy import full
 from src.error import InputError, AccessError
 from src.database import Database
 from re import fullmatch, regex
