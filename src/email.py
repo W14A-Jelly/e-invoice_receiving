@@ -62,10 +62,14 @@ def help_check_inbox(email_address, password,timestamp,user_id ):
                     # make sure invoice directory is created when the server is running.
                     fp = os.path.join(os.getcwd(),'invoices', str(user_id),file_name)
                     if not os.path.isfile(fp):
-                        fp = open(fp, 'wb')
-                        fp.write(part.get_payload(decode = True))
-                        fp.close()
-                        successful_invoice.append(file_name)
+                        # attatchment type checking
+                        if 'xml' in part.get_payload()[1].get_content_type():
+                            fp = open(fp, 'wb')
+                            fp.write(part.get_payload(decode = True))
+                            fp.close()
+                            successful_invoice.append(file_name)
+                        else: 
+                            pass
                         #DATABASE: store (file_name,user_id) into Invoice Ownership
         #DATABASE select is retrieve from email retrieve where email = email_address
     mail.close()
