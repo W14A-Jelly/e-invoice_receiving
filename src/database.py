@@ -6,18 +6,18 @@ Database class to manipulate table data and connect to SQLite server
 Arguments:
     table (string) - table name e.g 'Login', 'Email' or 'Ownership'
     id (integer) - Existing User id that correspond to a record in a table
-    data (dictionary) - e.g {password : 'password',
-                            email : 'exmaple@gmail.com', 
-                            session_id : '0 1',
-                            user_id : '0'}
+    data (dictionary) - e.g {'password' : 'password',
+                            'email' : 'exmaple@gmail.com', 
+                            'session_id' : '0 1',
+                            'user_id' : 0}
 
 Usecase:
     Database.start()
     Database.create_tables()
-    Database.insert('Login', {password : 'password',
-                                email : 'exmaple@gmail.com', 
-                                session_id : '0 1',
-                                user_id : '0'})
+    Database.insert('Login', {'password' : 'password',
+                                'email' : 'exmaple@gmail.com', 
+                                'session_id' : '0 1',
+                                'user_id' : 0})
     Database.update('Login', 0, {'password' :'newpassword',
                                     'email' : 'new@gmail.com'})
     Database.close()
@@ -96,10 +96,20 @@ class Database:
                 for record in table.select().order_by(table.user_id):
                     print(f'user_id: {record.user_id}')
                     print(f'xml_id: {record.xml_id}')
-                    print(symb * (num_symb + len(name) + 2))
+                    print(symb * (num_symb + len(name) + 2))            
 
 if __name__ == "__main__":
+    # Debug Database
     Database.start()
+    #Database.create_tables()
+    '''
+    login_data = {'password' : 'password',
+                            'email' : 'exmaple@gmail.com', 
+                            'session_id' : '0 1',
+                            'user_id' : 0}
+    '''
+    #Database.insert('Login', login_data)
+    #Database.insert('Ownership', {'user_id':0, 'xml_id':123})
     #data = {'password' :'password', 'email' : 'new2@gmail.com'}
     #Database.update('Login', 0, data)
     #Database.drop_tables()
