@@ -100,7 +100,7 @@ class Database:
 
 if __name__ == "__main__":
     # Debug Database
-    Database.start()
+    #Database.start()
     #Database.create_tables()
     '''
     login_data = {'password' : 'password',
@@ -114,4 +114,4 @@ if __name__ == "__main__":
     #Database.update('Login', 0, data)
     #Database.drop_tables()
     #Database.print_table('Login')
-    Database.stop()
+    #Database.stop()
