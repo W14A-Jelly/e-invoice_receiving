@@ -8,6 +8,9 @@ URL = f'http://127.0.0.1:{config.port}'
 # Http test file for update email:
 
 def test_update_email_valid_input(clear):
+    '''
+    Update an email correctly. Expect no errors.
+    '''
     # Register a user
     request_body1 = {
         'email' : 'test@gmail.com',
@@ -24,6 +27,9 @@ def test_update_email_valid_input(clear):
     assert not response2.json()
 
 def test_update_email_same_email(clear):
+    '''
+    Update email with the same email. Expect InputError.
+    '''
     # Register a user
     request_body1 = {
         'email' : 'test@gmail.com',
@@ -40,6 +46,9 @@ def test_update_email_same_email(clear):
     assert response2.status_code == InputError.code
 
 def test_update_email_already_exists(clear):
+    '''
+    Update email with an registered email. Expect InputError.
+    '''
     # Register a user
     request_body1 = {
         'email' : 'test@gmail.com',
@@ -62,6 +71,9 @@ def test_update_email_already_exists(clear):
     assert response3.status_code == InputError.code
 
 def test_update_email_bad_token(clear):
+    '''
+    Update an email with an invalid token. Expect AccessError.
+    '''
     # Update an email with invalid token
     request_body = {
         'token' : 'badtoken',
