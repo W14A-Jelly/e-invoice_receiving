@@ -3,37 +3,51 @@ import json
 # Helper functions for generating a communication report
 
 # Create new JSON file corresponding to a single invoice
+
+
 def create_new(invoice_id):
-    report_name = 'Invoice ' + str(invoice_id) + ' Report'
+    report_name = 'reports/invoice_' + str(invoice_id) + '_report.json'
     template = {
-        'invoice_id' : invoice_id,
-        'status' : '-',
-        'error' : '-',
+        'invoice_id': invoice_id,
+        'status': '-',
+        'error': '-',
     }
-    json_template = json.dumps(template)
     # Create new JSON file containing report template
     with open(report_name, 'w') as f:
-        json.dump(json_template, f)
+        json.dump(template, f)
         f.close()
     # Return the file's name
     return report_name
 
 # Update report in case of succesful reception
+
+
 def update_successful(report_name):
     with open(report_name, 'r+') as f:
         data = json.load(f)
         data['status'] = 'success'
+        data['error'] = 'none'
+        f.seek(0)
         json.dump(data, f)
+        f.truncate()
         f.close()
 
 # Update report in case of unsuccessful reception with relevant error message
+
+
 def update_unsuccessful(report_name, error_msg):
     with open(report_name, 'r+') as f:
         data = json.load(f)
-        json.dump(data, f)
         data['status'] = 'unsuccessful'
         data['error'] = error_msg
+        f.seek(0)
         json.dump(data, f)
+        f.truncate()
         f.close()
 
 
+if __name__ == "__main__":
+    report1 = create_new(1)
+    update_successful(report1)
+    report2 = create_new(2)
+    update_unsuccessful(report2, 'invalid UBL format')
