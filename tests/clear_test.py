@@ -18,6 +18,7 @@ def test_clear_database():
 
     logoutData = {'email' : 'user1@gmail.com'}
     Database.update('Logout', 0, logoutData)
+    Database.drop_tables()
 
     Database.update('Login', 0 , userData)
     assert response.status_code == AccessError.code
