@@ -1,4 +1,4 @@
-from src.schema import db, Login, Email, Ownership
+from schema import db, Login, Email, Ownership
 
 '''
 Database class to manipulate table data and connect to SQLite server
@@ -20,7 +20,7 @@ Usecase:
                                 'user_id' : 0})
     Database.update('Login', 0, {'password' :'newpassword',
                                     'email' : 'new@gmail.com'})
-    print(Database.get('Login', 0)[0].email) # 
+    print(Database.get_id('Login', 0)[0].email) # 
     Database.close()
 '''
 
@@ -60,10 +60,16 @@ class Database:
         table = find_table(table)
         table.update(data).where(table.user_id==id).execute()
 
-    def get(table, id):
+    def get_id(table, id):
         # Returns a list of rows in a table with given user_id
         table = find_table(table)
         query = table.select().where(table.user_id==id).order_by(table.user_id)
+        return [row for row in query]
+
+    def get_table(table):
+        # Returns a list of all rows in a table
+        table = find_table(table)
+        query = table.select().order_by(table.user_id)
         return [row for row in query]
 
     def num_rows(table):
@@ -111,9 +117,9 @@ if __name__ == "__main__":
     #Database.create_tables()
     '''
     login_data = {'password' : 'password',
-                            'email' : 'exmaple@gmail.com', 
+                            'email' : 'exmaple1@gmail.com', 
                             'session_id' : '0 1',
-                            'user_id' : 0}
+                            'user_id' : 1}
     '''
     #Database.insert('Login', login_data)
     #Database.insert('Ownership', {'user_id':0, 'xml_id':123})
@@ -122,5 +128,6 @@ if __name__ == "__main__":
     #Database.update('Login', 0, data)
     #Database.drop_tables()
     #print(Database.get('Ownership', 0)[1].xml_id)
-    #Database.print_table('Ownership')
+    #print(Database.get_table('Login')[1].user_id)
+    #Database.print_table('Login')
     #Database.stop()
