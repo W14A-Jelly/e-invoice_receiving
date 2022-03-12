@@ -5,6 +5,7 @@ import os
 import email
 import threading
 from datetime import datetime, timedelta, timezone
+from imbox import Imbox
 def email_set(token, email_address, email_pass):
     '''
     some description
@@ -38,7 +39,7 @@ def help_check_inbox(email_address, password,timestamp,user_id ):
     login_status, acc = mail.login(email_address, password)
     if login_status != 'OK':
         raise AccessError('Login using given crenditial failed')
-    while is_retrieve == false:
+    while is_retrieve == True:
         inbox_status, data = mail.select('Inbox')
         if inbox_status != 'OK':
             raises AccessError("Cannot search inbox")
@@ -60,7 +61,7 @@ def help_check_inbox(email_address, password,timestamp,user_id ):
                     is_retrieve: email.info[0].is_retrieve
                     is_comm_report = email.info[0].is_comm_report
                 }
-            if timestamp > m['Date']:
+            if timestamp > m['Date'].replace(tzinfo=timezone.utc).timestamp():
                 Database.update('Email', user_id, updated)
                 break
             if mid = Database.get_id('Email',user_id)[0].latest_xml_id:
@@ -93,7 +94,7 @@ def help_check_inbox(email_address, password,timestamp,user_id ):
                                 except:
                                     report.update_unsuccessful(rp_name,'cannot save invoice')
                             else:
-                                report update_unsuccessful(rp_name, 'Not UBL standard')
+                                report.update_unsuccessful(rp_name, 'Not UBL standard')
 
         #sleep(30)                       
         is_retrieve = Database.get_id('Email', user_id)[0].is_retrieve
@@ -101,9 +102,41 @@ def help_check_inbox(email_address, password,timestamp,user_id ):
     mail.close()
     mail.logout()
 
+'''
+def retrival2(email_address, password,timestamp,user_id):
+    is_retrieve = Database.get_id('Email', user_id)[0].is_retrieve
+    while is_retrieve == True:
+        host = "imap.gmail.com"
+        try:
+            mail = Imbox(host,username = email_address, password = password, ssl = True, ssl_content = None, Starttls = False)
+        except:
+            raise AccessError("cannot login with given crenditial")
 
+        mail_messages = imbox.messages(unread = True)
 
+        for (m_id, message) in mail_messages():
+            if timestamp > message.date.replace(tzinfo=timezone.utc).timestamp():
+                break
+            for attachment in message.attachments:
+                if 'xml' in attachment['content-type']:
+                    rp_name = create_new(file_name)
+                    if email_validate_xml(attachment['content']):
+                        fp = os.path.join(os.getcwd(),'invoices', str(user_id),attachment['filename'])
+                        try:
+                            fp = open(fp,'wb')
+                            fp.write(attachment['content'])
+                            fp.close()
+                            report.update_successful(rp_name)
+                            Database.insert('Ownership', {user_id: user_id, xml_id = file_name})
+                        except:
+                            report.update_unsuccessful(rp_name, f'failed to save %s',attachment['filename'])
 
+                    else:
+                        report.update_unsuccessful(rp_name, f'%s Not UBL standard', attachment['filename'])
+
+        is_retrieve = Database.get_id('Email', user_id)[0].is_retrieve
+
+'''
 
         
 
