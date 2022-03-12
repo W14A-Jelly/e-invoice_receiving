@@ -23,15 +23,14 @@ def email_retrieve_start(token):
 
     if is_retrieve = True():
         raise AccessError('There is an active retrieving session already')
-    params = [email_receive, password, datetime.now().replace(tzinfo=timezone.utc).timestamp()]
+    params = [email_receive, password, datetime.now().replace(tzinfo=timezone.utc).timestamp(),user_id]
     t = threading.Thread(help_check_inbox, params)
     t.start()
     return {}
 
 def help_check_inbox(email_address, password,timestamp,user_id ):
-    #DATABASE select user_id from email receive where email_receive = email_address
     #DATABASE select is retrieve from email retrieve where email = email_address
-    #TODO: figure out what I need to put in comms.
+    is_retrieve = Database.get_id('Email', user_id)[0].is_retrieve
     successful_invoice = []
     mail = imaplib.IMAP4_SSL("imap.gmail.com")
     login_status, acc = mail.login(email_address, password)
@@ -70,8 +69,8 @@ def help_check_inbox(email_address, password,timestamp,user_id ):
                             successful_invoice.append(file_name)
                         else: 
                             pass
-                        #DATABASE: store (file_name,user_id) into Invoice Ownership
-        #DATABASE select is retrieve from email retrieve where email = email_address
+                        Database.insert('Ownership', {user_id: user_id, xml_id = file_name})
+        is_retrieve = Database.get_id('Email', user_id)[0].is_retrieve
     mail.close()
     mail.logout()
     #TODO: call report output and give successful_invoice to it
