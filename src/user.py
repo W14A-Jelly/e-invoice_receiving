@@ -41,7 +41,7 @@ def user_update_email(token, email):
     elif fullmatch(regex, email) == None:
         return InputError('Invalid email format')
 
-    all_email = [user.email for user in Database.get('Login', token.user_id)]
+    all_email = [user.email for user in Database.get_table('Login')]
     if email in all_email:
         raise InputError('Email address already used')
         
