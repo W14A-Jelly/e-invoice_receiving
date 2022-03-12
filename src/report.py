@@ -1,4 +1,6 @@
 import json
+import os
+import glob
 
 # Helper functions for generating a communication report
 
@@ -45,9 +47,35 @@ def update_unsuccessful(report_name, error_msg):
         f.truncate()
         f.close()
 
+# Returns data from all reports as a list
+
+
+def return_reports():
+    all_reports = []
+    directory = 'reports'
+    for report in os.listdir(directory):
+        with open(os.path.join(directory, report), 'r') as f:
+            data = json.load(f)
+            all_reports.append(data)
+    return all_reports
+
+# Clears all reports from the reports folder
+
+
+def clear_reports():
+    reports = glob.glob('reports/*')
+    for report in reports:
+        os.remove(report)
+
 
 if __name__ == "__main__":
     report1 = create_new(1)
     update_successful(report1)
-    report2 = create_new(2)
-    update_unsuccessful(report2, 'invalid UBL format')
+
+    # report2 = create_new(2)
+    # update_unsuccessful(report2, 'invalid UBL format')
+
+    # all_reports = return_reports()
+    # print(all_reports)
+
+    # clear_reports()
