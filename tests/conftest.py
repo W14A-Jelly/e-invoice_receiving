@@ -43,7 +43,7 @@ def user_2():
     '''
     Register 2nd user with a valid email for invoice retrieval
     '''
-    valid_email = 'einvoice.retrieve2@outlook.com'
+    valid_email = 'einvoice.retrieve2@gmail.com'
     email_pass = 'retrieve2@jelly'
 
     # Register user2
