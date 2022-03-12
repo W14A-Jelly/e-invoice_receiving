@@ -18,8 +18,10 @@ def email_retrieve_start(token):
     parameters: token
     returns; {}
     '''
-    #decode = validata_token(token)
-    #user_id = decode['email_address']
+    decode = decode_token(token)
+    if decode = None:
+        raise AccessError('Bad token')
+    user_id = decode['email_address']
     # from the database, select email_receive, password and is_retrieve from email receive
     i = Database.get_id('Email', user_id)[0]
     email_receive = i.email_retrieve
@@ -121,25 +123,33 @@ def retrival2(email_address, password,timestamp,user_id):
                 if 'xml' in attachment['content-type']:
                     rp_name = create_new(file_name)
                     data = attachment.get('content').read()
-                    if email_validate_xml(data):
-                        fp = os.path.join(os.getcwd(),'invoices', str(user_id),attachment['filename'])
-                        try:
-                            f = open(fp,'wb')
-                            f.write(data)
-                            f.close()
+                    fp = os.path.join(os.getcwd(),'invoices', str(user_id),attachment['filename'])
+                    d_successful = False
+                    try:
+                        f = open(fp,'wb')
+                        f.write(data)
+                        f.close()
+                        Database.insert('Ownership', {user_id: user_id, xml_id = file_name})
+                        d_successful = True
+                    except:
+                        report.update_unsuccessful(rp_name, f'failed to save %s',attachment['filename'])
+                    if d_successful == True:
+                        valid = email_validate_xml(fp)
+                        if valid == False:
+                            report.update_unsuccessful(rp_name, f'%s Not UBL standard', attachment['filename'])
+                            os.remove(fp)
+                        else:
                             report.update_successful(rp_name)
-                            Database.insert('Ownership', {user_id: user_id, xml_id = file_name})
-                        except:
-                            report.update_unsuccessful(rp_name, f'failed to save %s',attachment['filename'])
 
-                    else:
-                        report.update_unsuccessful(rp_name, f'%s Not UBL standard', attachment['filename'])
+
 
         is_retrieve = Database.get_id('Email', user_id)[0].is_retrieve
 
 
         
-
+'''
+                    else:
+                        report.update_unsuccessful(rp_name, f'%s Not UBL standard', attachment['filename'])'''
 
 def email_validate_xml():
     # module to email_retrieve_start
