@@ -7,5 +7,6 @@ omit =
     test_*.py
     *_test.py
     src/server.py
-    src/data_store.py
+    src/database.py
+    src/schema.py
     */__init__.py
