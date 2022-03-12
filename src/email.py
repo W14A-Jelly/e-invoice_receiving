@@ -101,7 +101,7 @@ def email_retrieve_end(token):
     '''
     description: Stop retrieving xml for the given token user
     parameter:{token}
-    return value: {}
+    return value: {reports: []}
     '''
     #decode = validata_token(token)
     #user_id = decode['email_address']
@@ -123,5 +123,7 @@ def email_retrieve_end(token):
 
 
         }
-        Database.update('Email', user_id, email_info[0])
-    return {}
+        Database.update('Email', user_id, updated)
+        reports = report.return_reports()
+        report.clear_reports()
+    return {'reports':reports}
