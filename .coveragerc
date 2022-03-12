@@ -9,4 +9,6 @@ omit =
     src/server.py
     src/database.py
     src/schema.py
+    src/error.py
+    src/config.py
     */__init__.py
