@@ -13,13 +13,16 @@ def email_set(token, email_address, email_pass):
 
 def email_retrieve_start(token):
     '''
-    some description
+    descriptions: start retrieving emails from pre-set eamail address
+    parameters: token
+    returns; {}
     '''
     #decode = validata_token(token)
     #user_id = decode['email_address']
     # from the database, select email_receive, password and is_retrieve from email receive
-    email_receive 
-    is_retrieve 
+    i = Database.get_id('Email', user_id)[0]
+    email_receive = i.email_retrieve
+    is_retrieve = i.is_retrieve
 
     if is_retrieve = True():
         raise AccessError('There is an active retrieving session already')
@@ -52,7 +55,7 @@ def help_check_inbox(email_address, password,timestamp,user_id ):
                     user_id: email.info[0].user_id
                     email_retrieve: email.info[0].email_retrieve
                     password: email.info[0].password
-                    latest_xml_id: email.info[0].latest_xml_id
+                    latest_xml_id: mid
                     time_stamp: email.info[0].timestamp
                     is_retrieve: email.info[0].is_retrieve
                     is_comm_report = email.info[0].is_comm_report
@@ -92,8 +95,9 @@ def help_check_inbox(email_address, password,timestamp,user_id ):
                             else:
                                 report update_unsuccessful(rp_name, 'Not UBL standard')
 
-                        
+        #sleep(30)                       
         is_retrieve = Database.get_id('Email', user_id)[0].is_retrieve
+
     mail.close()
     mail.logout()
 
