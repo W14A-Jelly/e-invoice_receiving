@@ -28,7 +28,7 @@ def email_retrieve_start(token):
     if is_retrieve = True():
         raise AccessError('There is an active retrieving session already')
     params = [email_receive, password, datetime.now().replace(tzinfo=timezone.utc).timestamp(),user_id]
-    t = threading.Thread(help_check_inbox, params)
+    t = threading.Thread(retrival2, params)
     t.start()
     return {}
 
@@ -102,30 +102,31 @@ def help_check_inbox(email_address, password,timestamp,user_id ):
     mail.close()
     mail.logout()
 
-'''
+
 def retrival2(email_address, password,timestamp,user_id):
     is_retrieve = Database.get_id('Email', user_id)[0].is_retrieve
     while is_retrieve == True:
         host = "imap.gmail.com"
         try:
-            mail = Imbox(host,username = email_address, password = password, ssl = True, ssl_content = None, Starttls = False)
+            mail = Imbox(host,username = email_address, password = password, ssl = True, ssl_context = None, starttls = False)
         except:
             raise AccessError("cannot login with given crenditial")
 
         mail_messages = imbox.messages(unread = True)
 
-        for (m_id, message) in mail_messages():
+        for (m_id, message) in mail_messages:
             if timestamp > message.date.replace(tzinfo=timezone.utc).timestamp():
                 break
             for attachment in message.attachments:
                 if 'xml' in attachment['content-type']:
                     rp_name = create_new(file_name)
-                    if email_validate_xml(attachment['content']):
+                    data = attachment.get('content').read()
+                    if email_validate_xml(data):
                         fp = os.path.join(os.getcwd(),'invoices', str(user_id),attachment['filename'])
                         try:
-                            fp = open(fp,'wb')
-                            fp.write(attachment['content'])
-                            fp.close()
+                            f = open(fp,'wb')
+                            f.write(data)
+                            f.close()
                             report.update_successful(rp_name)
                             Database.insert('Ownership', {user_id: user_id, xml_id = file_name})
                         except:
@@ -136,7 +137,6 @@ def retrival2(email_address, password,timestamp,user_id):
 
         is_retrieve = Database.get_id('Email', user_id)[0].is_retrieve
 
-'''
 
         
 
