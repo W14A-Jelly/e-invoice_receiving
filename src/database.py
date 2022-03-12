@@ -1,4 +1,4 @@
-from schema import db, Login, Email, Ownership
+from src.schema import db, Login, Email, Ownership
 
 '''
 Database class to manipulate table data and connect to SQLite server
@@ -117,17 +117,17 @@ if __name__ == "__main__":
     #Database.create_tables()
     '''
     login_data = {'password' : 'password',
-                            'email' : 'exmaple1@gmail.com', 
+                            'email' : 'exmaple2@gmail.com', 
                             'session_id' : '0 1',
                             'user_id' : 1}
     '''
     #Database.insert('Login', login_data)
     #Database.insert('Ownership', {'user_id':0, 'xml_id':123})
     #Database.insert('Ownership', {'user_id':0, 'xml_id':124})
-    #data = {'password' :'password', 'email' : 'new2@gmail.com'}
+    #data = {'password' :'newpassword', 'email' : 'new2@gmail.com'}
     #Database.update('Login', 0, data)
     #Database.drop_tables()
-    #print(Database.get('Ownership', 0)[1].xml_id)
+    #print(Database.get_id('Login', 0)[0].email)
     #print(Database.get_table('Login')[1].user_id)
     #Database.print_table('Login')
     #Database.stop()
