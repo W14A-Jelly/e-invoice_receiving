@@ -14,11 +14,11 @@ def decode_token(token):
         If this token does not refer to a valid logged in user
         return None.
     '''
-    secrete_string = 'JELLY2021'
+    secret_str = 'JELLY2021'
 
     try:
         users = [user.user_id for user in Database.get_table('Login')]
-        decode_data = jwt.decode(token, secrete_string, algorithms = ['HS256'])
+        decode_data = jwt.decode(token, secret_str, algorithms = ['HS256'])
         session = Database.get_id('Login', decode_data['user_id'])[0].session_id
     except:
         return None
