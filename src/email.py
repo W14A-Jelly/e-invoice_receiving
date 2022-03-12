@@ -103,8 +103,10 @@ def email_retrieve_end(token):
     parameter:{token}
     return value: {reports: []}
     '''
-    #decode = validata_token(token)
-    #user_id = decode['email_address']
+    decode = decode_token(token)
+    if decode == None:
+        raise AccessError('bad token')
+    user_id = decode['user_id']
     email_info = Database.get_id('Email',user_id)
     if email_info == []:
         raise AccessError("The user has no email credential for retrieving emails from")
