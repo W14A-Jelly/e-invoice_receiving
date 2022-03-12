@@ -49,22 +49,16 @@ def register_new_user():
 
     return dumps(user_register(input['email_address'],input['password']))
 
-@APP.route("/auth/login", methods=['POST'])
+@APP.route("/user/login", methods=['POST'])
 def login_user():
     input = request.get_json()
 
     return dumps(user_login(input['email_address'],input['password']))
 
-@APP.route("/auth/logout", methods=['POST'])
-def login_user():
+@APP.route("/user/logout", methods=['POST'])
+def logout_user():
     input = request.get_json()
-
-    #need to change session method
-    decoded_token = decode_token(info['token'])
-    current_session = decoded_token['session_id']
-    for user in users:
-    if info['token'] in user['token']: #if the input token is in the users' list of tokens
-    user['session_list'].remove(current_session)
+    user_logout(input['token'])
 
     return dumps({})
 
