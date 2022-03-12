@@ -31,7 +31,6 @@ def email_retrieve_start(token):
 def help_check_inbox(email_address, password,timestamp,user_id ):
     #DATABASE select is retrieve from email retrieve where email = email_address
     is_retrieve = Database.get_id('Email', user_id)[0].is_retrieve
-    successful_invoice = []
     mail = imaplib.IMAP4_SSL("imap.gmail.com")
     login_status, acc = mail.login(email_address, password)
     if login_status != 'OK':
@@ -63,17 +62,23 @@ def help_check_inbox(email_address, password,timestamp,user_id ):
                     if not os.path.isfile(fp):
                         # attatchment type checking
                         if 'xml' in part.get_payload()[1].get_content_type():
-                            fp = open(fp, 'wb')
-                            fp.write(part.get_payload(decode = True))
-                            fp.close()
-                            successful_invoice.append(file_name)
-                        else: 
-                            pass
-                        Database.insert('Ownership', {user_id: user_id, xml_id = file_name})
+                            rp_name =create_new(file_name)
+                            if email_validate_xml(part.get_payload(decode = True)):
+                                try:
+                                    fp = open(fp, 'wb')
+                                    fp.write(part.get_payload(decode = True))
+                                    fp.close()
+                                    report.update_successful(rp_name)
+                                    Database.insert('Ownership', {user_id: user_id, xml_id = file_name})
+                                except:
+                                    report.update_unsuccessful(rp_name,'cannot save invoice')
+                            else:
+                                report update_unsuccessful(rp_name, 'Not UBL standard')
+
+                        
         is_retrieve = Database.get_id('Email', user_id)[0].is_retrieve
     mail.close()
     mail.logout()
-    #TODO: call report output and give successful_invoice to it
 
 
 
