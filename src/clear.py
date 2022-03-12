@@ -1,17 +1,24 @@
-import sqlite3
+from database import Database
 
-# Clears all data from the user table in SQLite database
+
 def clear():
-    try:
-        connection = sqlite3.connect('Db.db')
-        cursor = connection.cursor()
-        query = "DELETE FROM Users"
-        cursor.execute(query)
-        connection.commit()
-        cursor.close()
+    Database.drop_tables()
 
-    except sqlite3.Error as error:
-        print("Error while connecting to sqlite", error)
-    finally:
-        if connection:
-            connection.close()
+
+if __name__ == "__main__":
+    Database.start()
+    clear()
+    Database.create_tables()
+    login_data = {'password': 'password',
+                  'email': 'exmaple2@gmail.com',
+                  'session_id': '0 1',
+                  'user_id': 1}
+
+    Database.insert('Login', login_data)
+    Database.print_table('Login')
+    Database.insert('Ownership', {'user_id': 1, 'xml_id': 123})
+    Database.print_table('Ownership')
+    clear()
+    Database.create_tables()
+    Database.print_table('Login')
+    Database.print_table('Ownership')
