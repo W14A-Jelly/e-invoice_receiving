@@ -1,6 +1,6 @@
 from src.error import InputError, AccessError
 from src.database import Database
-from re import fullmatch, regex
+from re import fullmatch
 
 def user_register(user_name, password, email_address):
     '''
@@ -35,6 +35,8 @@ def user_update_email(token, email):
     Return Value:
         Returns an empty dictionary on successful request.
     '''
+    regex = r'^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$'
+    
     # TODO Get user_id
     if token == 'not valid':
         return AccessError('Invalid token')
