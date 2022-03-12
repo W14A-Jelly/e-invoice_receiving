@@ -84,7 +84,7 @@ def test_pass_invalid(clear):
     response = requests.post(f"{URL}/user/register", json = request_body)
     assert response.status_code == 400
 
-def test_register_pass_edgecase():
+def test_register_pass_edgecase(clear):
     '''
     Test when the password length is exactly 6 or 20, which should be registered successfully.
     '''
