@@ -1,5 +1,6 @@
 import imaplib
-from src.error import InputError, AccessError
+import helper
+from error import InputError, AccessError
 from database import Database
 
 
@@ -10,13 +11,10 @@ def email_set(token, email_address, email_pass):
     if login_status != 'OK':
         raise AccessError(
             'Could not update email, given credentials are invalid')
-
-    # user_id will be extrapolated from the token
-    # user_id = decode(token)
-
-    Database.start()
     # Update database with new email and password
-    updated_data = {'password': email_pass, 'email': email_address}
+    user_id = helper.decode_token(token)['user_id']
+    Database.start()
+    updated_data = {'password': email_pass, 'email_receive': email_address}
     Database.update('Email', user_id, updated_data)
     Database.stop()
     return {}
@@ -50,3 +48,29 @@ def email_retrieve_end(token):
     some description
     '''
     return {}
+
+
+if __name__ == '__main__':
+    Database.start()
+    Database.drop_tables()
+    Database.create_tables()
+    login_data = {'password': 'password',
+                  'email': 'exmaple@gmail.com',
+                  'session_id': '0 1',
+                  'user_id': 0}
+
+    Database.insert('Login', login_data)
+    data = {'user_id': '0',
+            'email_receive': 'test@gmail.com',
+            'password': 'test1234',
+            'latest_xml_id': 'xml_000',
+            'time_stamp': '1:24pm',
+            'is_retrieve': 'True',
+            'is_comm_report': 'True'
+            }
+    Database.insert('Email', data)
+    Database.print_table('Email')
+    updated_data = {'email_receive': 'testchanged@gmail.com',
+                    'password': 'testchanged'}
+    Database.update('Email', 0, updated_data)
+    Database.print_table('Email')
