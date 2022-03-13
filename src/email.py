@@ -35,6 +35,18 @@ def email_set(token, email_address, email_pass):
             '''
     # Update database with new email and password
     user_id = decode_token(token)['user_id']
+
+    if len(Database.get_id('Email', decode_data['user_id'])) == 0:
+        insert_data = { 'user_id': decode_data['user_id'],
+                        'password': email_pass, 
+                        'email_receive': email_address,
+                        'latest_xml_id': ' ',
+                        'time_stamp' : datetime.now(),
+                        'is_retrieve' : False,
+                        'is_comm_report' : False
+                        }
+        Database.insert('Email', insert_data)
+
     updated_data = {'password': email_pass, 'email_receive': email_address}
     Database.update('Email', user_id, updated_data)
     return {}
@@ -49,16 +61,18 @@ def email_retrieve_start(token):
     decode = decode_token(token)
     if decode == None:
         raise AccessError('Bad token')
-    user_id = decode['email_address']
+    user_id = decode['user_id']
     # from the database, select email_receive, password and is_retrieve from email receive
     i = Database.get_id('Email', user_id)[0]
-    email_receive = i.email_retrieve
+    email_address = i.email_receive
     is_retrieve = i.is_retrieve
+    password = i.password
 
-    if is_retrieve == True():
+    if is_retrieve == True:
         raise AccessError('There is an active retrieving session already')
-    params = [email_receive, password, datetime.now().replace(tzinfo=timezone.utc).timestamp(),user_id]
-    t = threading.Thread(retrival2, params)
+    params = [email_address, password, datetime.now().replace(tzinfo=timezone.utc).timestamp(),user_id]
+    Database.update('Email', user_id, {'is_retrieve' : True})
+    t = threading.Thread(target=retrival2, args=params)
     t.start()
     return {}
 

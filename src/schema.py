@@ -24,7 +24,7 @@ class Email(Entity):
     user_id = pw.ForeignKeyField(Login)
     email_receive = pw.TextField(unique=True)
     password = pw.TextField(constraints=[pw.Check(pass_constraint)])
-    latest_xml_id = pw.TextField(unique=True)
+    latest_xml_id = pw.TextField(unique=False)
     time_stamp = pw.DateTimeField()
     is_retrieve = pw.BooleanField(default=False)
     is_comm_report = pw.BooleanField(default=False)

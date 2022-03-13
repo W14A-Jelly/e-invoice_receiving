@@ -17,7 +17,7 @@ def test_invalid_email_set(clear, user_1):
     "email_pass": "Strongpword1"
     })
 
-    assert response.status_code == 400
+    assert response.status_code == 403
 
 def test_email_set_two(clear, user_1):
     '''
