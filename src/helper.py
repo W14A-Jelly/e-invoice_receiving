@@ -23,9 +23,15 @@ def decode_token(token):
         session = Database.get_id('Login', decode_data['user_id'])[
             0].session_id
     except:
+        print('abc')
         return None
+<<<<<<< HEAD
 
     session = session.split(' ', 1)
+=======
+    
+    session = session.split()
+>>>>>>> main
     if decode_data['user_id'] in users and decode_data['session_id'] in session:
         return {'user_id': decode_data['user_id'],
                 'session_id': decode_data['session_id']}

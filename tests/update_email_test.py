@@ -22,7 +22,7 @@ def test_update_email_valid_input(clear):
         'token' : response1.json()['token'],
         'email' : 'testchange@gmail.com',
     }
-    response2 = requests.put(f"{URL}/user/update/email", params=request_body2)
+    response2 = requests.put(f"{URL}/user/update/email", json=request_body2)
     # Empty dictionary is returned
     assert not response2.json()
 
@@ -41,7 +41,7 @@ def test_update_email_same_email(clear):
         'token' : response1.json()['token'],
         'email' : 'test@gmail.com',
     }
-    response2 = requests.put(f"{URL}/user/update/email", params=request_body2)
+    response2 = requests.put(f"{URL}/user/update/email", json=request_body2)
     # Input Error
     assert response2.status_code == InputError.code
 
@@ -66,7 +66,7 @@ def test_update_email_already_exists(clear):
         'token' : response1.json()['token'],
         'email' : 'testInUse@gmail.com',
     }
-    response3 = requests.put(f"{URL}/user/update/email", params=request_body3)
+    response3 = requests.put(f"{URL}/user/update/email", json=request_body3)
     # Input Error
     assert response3.status_code == InputError.code
 
@@ -79,7 +79,7 @@ def test_update_email_bad_token(clear):
         'token' : 'badtoken',
         'email' : 'testupdate@gmail.com',
     }
-    response = requests.put(f"{URL}/user/update/email", params=request_body)
+    response = requests.put(f"{URL}/user/update/email", json=request_body)
     # Input Error
     assert response.status_code == AccessError.code
 
