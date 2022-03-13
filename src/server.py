@@ -105,3 +105,9 @@ def update_password():
 def data_clear():
     clear()
     return {}  
+
+if __name__ == "__main__":
+    signal.signal(signal.SIGINT, quit_gracefully) # For coverage
+    APP.run(port=config.port) # Do not edit this port
+    Database.start()
+    Database.create_tables()
