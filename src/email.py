@@ -6,7 +6,7 @@ import email
 import threading
 from datetime import datetime, timedelta, timezone
 from imbox import Imbox
-import report
+import src.report
 from src.database import Database
 from src.helper import decode_token
 from lxml import etree
@@ -14,17 +14,29 @@ import os
 
 def email_set(token, email_address, email_pass):
     # validate email can be logged into
-    mail = imaplib.IMAP4_SSL("imap.gmail.com")
-    login_status, acc = mail.login(email_address, email_pass)
+    #host = imaplib.IMAP4_SSL("imap.gmail.com")
+    
+    decode_data = decode_token(token)
+    if decode_data == None:
+        raise AccessError('Invalid token')
+
+    try:
+        host = "imap.gmail.com"
+        mail = Imbox(host,username = email_address, password = email_pass, ssl = True, ssl_context = None, starttls = False)
+        mail.logout
+        #login_status, acc = mail.login(email_address, email_pass)
+    except:
+        raise AccessError(
+            'Could not update email, given credentials are invalid')
+    '''
     if login_status != 'OK':
         raise AccessError(
             'Could not update email, given credentials are invalid')
+            '''
     # Update database with new email and password
     user_id = decode_token(token)['user_id']
-    Database.start()
     updated_data = {'password': email_pass, 'email_receive': email_address}
     Database.update('Email', user_id, updated_data)
-    Database.stop()
     return {}
 
 
@@ -213,6 +225,7 @@ def email_retrieve_end(token):
     return value: {reports: []}
     '''
 
+'''
 if __name__ == '__main__':
     Database.start()
     Database.drop_tables()
@@ -269,4 +282,4 @@ if __name__ == '__main__':
 if __name__ == '__main__':
     print(email_validate_xml('invoices/example1.xml'))
 
-
+'''
