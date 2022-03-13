@@ -1,46 +1,34 @@
 import json
 import requests
 import pytest
+from src import config
 
-def test_email_set(clear):
-    '''
-    Basic test for email_set()
-    User provides their email to be used as the receiving address. Expect token to be generated correctly.
-    '''
-    response = requests.post(f"{url}/email/set", json = {
-    "email": "user1@gmail.com",
-    "password": "Strongpword1"
-    })
+url = f'http://127.0.0.1:{config.port}'
 
-    encode_token = generate_token(1, 1)
-    assert json.loads(response.text) == {'token': encode_token}
-
-def test_invalid_email_set(clear):
+def test_invalid_email_set(clear, user_1):
     '''
     Exception test for email_set()
     User provides an invalid email. Expect InputError.
     '''
+    
     response = requests.post(f"{url}/email/set", json = {
+    'token' : user_1['token'],
     "email": "user1.com",
-    "password": "Strongpword1"
+    "email_pass": "Strongpword1"
     })
 
-    assert response.status_code == 400
+    assert response.status_code == 403
 
-def test_email_set_two(clear):
+def test_email_set_two(clear, user_1):
     '''
     Exception test for email_set()
     User provides an email which is already in use. Expect InputError.
     '''
     response = requests.post(f"{url}/email/set", json = {
-    "email": "user1@gmail.com",
-    "password": "Strongpword1"
+    'token' : user_1['token'],
+    "email": "user1@outlook.com",
+    "email_pass": "Strongpword1"
     })
 
-    requests.delete(f"{url}/clear/v1")
-    response = requests.post(f"{url}/email/set", json = {
-    "email": "user1@gmail.com",
-    "password": "Strongpword2"
-    })
-    assert response.status_code == 400
+    assert response.status_code == 403
     

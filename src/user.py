@@ -1,23 +1,94 @@
 from src.error import InputError, AccessError
 from src.database import Database
+from src.helper import decode_token
 from re import fullmatch
+from src.helper import decode_token
+import jwt
 
-def user_register(email_address, password, ):
+SECRET_KEY = 'JELLY2021'
+
+def user_register(email_address, password):
     '''
     some description
     '''
-    return {'token' : 'Change this'}
+
+    #store = data_store.get()
+    #users = store['users']
+    reg = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
+
+    #check if email is valid
+    if fullmatch(reg, email_address) is None:
+        raise InputError(description='invalid email')
+    elif not (len(password) >= 6 and len(password) <= 20):
+        raise InputError('Password size is not between 6 to 20 inclusive')
+
+
+    #if new user details are valid, add them to the list of 'users'
+
+    user_id = Database.num_rows('Login')
+    for user in Database.get_table('Login'):
+        if user.email == email_address:
+            raise InputError('')
+
+    data = {'email': email_address,'password': password, 'user_id' : user_id, 'session_id' : '0'}
+    
+    Database.insert('Login', data)
+    # generate_token
+    newToken = jwt.encode({'user_id': user_id, 'session_id': '0'}, SECRET_KEY, algorithm='HS256')
+
+    return {'token' : newToken}
 
 def user_login(email_address, password):
     '''
     some description
     '''
-    return {'token' : 'Change this'}
+    session = ''
+    validate = 0
+    all_email = [user.email for user in Database.get_table('Login')]
+    for email in all_email: 
+        if email == email_address:
+            validate = 1
+            break
+ 
+    for user in Database.get_table('Login'):
+        if user.email == email_address:
+            if user.password == password:
+                validate = 1
+                session = user.session_id
+                userID = user.user_id
+                Database.update('Login', userID, {'email' : email})
+                break
+
+    if session == '':
+        session += '0'
+    else: 
+        session = ' ' + str(int(session.split()[-1]) + 1)
+
+    if validate == 0:
+        raise InputError(description='Email not in the list or password is incorrect')
+
+    Database.update('Login', userID, {'session_id' : session})
+
+    newToken = jwt.encode({'user_id': userID, 'session_id': session}, SECRET_KEY, algorithm='HS256')
+    return {'token' : newToken}
 
 def user_logout(token):
     '''
     some description
     '''
+    token_data = decode_token(token)
+    if token_data == None:
+        raise AccessError('Invalid token')
+
+    user = Database.get_id('Login', token_data['user_id'])[0]
+    session = user.session_id
+    sessionList = session.split()
+
+    sessionList.remove(session)
+    new_session_id = ' '.join(sessionList)
+
+    Database.update('Login', token_data['user_id'], {'session_id' : new_session_id})
+
     return {}
 
 def user_update_email(token, email):
@@ -37,17 +108,17 @@ def user_update_email(token, email):
     '''
     regex = r'^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$'
     
-    # TODO Get user_id
-    if token == 'not valid':
-        return AccessError('Invalid token')
+    token_data = decode_token(token)
+    if token_data == None:
+        raise AccessError('Invalid token')
     elif fullmatch(regex, email) == None:
-        return InputError('Invalid email format')
+        raise InputError('Invalid email format')
 
     all_email = [user.email for user in Database.get_table('Login')]
     if email in all_email:
         raise InputError('Email address already used')
         
-    Database.update('Login', token.user_id, {'email' : email})
+    Database.update('Login', token_data['user_id'], {'email' : email})
 
     return {}
 
@@ -67,12 +138,12 @@ def user_update_password(token, password):
         Returns an empty dictionary on successful request.
 
     '''
-    # TODO Get user_id
-    if token == 'not valid':
-        return AccessError('Invalid token')
+    token_data = decode_token(token)
+    if token_data == None:
+        raise AccessError('Invalid token')
     elif not (len(password) >= 6 and len(password) <= 20):
-        return InputError('Password is not between length 6 to 20 inclusive')
+        raise InputError('Password is not between length 6 to 20 inclusive')
 
-    Database.update('Login', token.user_id, {'password' : password})
+    Database.update('Login', token_data['user_id'], {'password' : password})
 
     return {}

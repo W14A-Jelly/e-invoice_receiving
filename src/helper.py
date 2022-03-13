@@ -21,9 +21,8 @@ def decode_token(token):
         decode_data = jwt.decode(token, secret_str, algorithms = ['HS256'])
         session = Database.get_id('Login', decode_data['user_id'])[0].session_id
     except:
-        return None
-    
-    session = session.split(' ', 1)
+        return None    
+    session = session.split()
     if decode_data['user_id'] in users and decode_data['session_id'] in session:
         return {'user_id': decode_data['user_id'], 
                 'session_id': decode_data['session_id']}

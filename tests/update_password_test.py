@@ -22,7 +22,7 @@ def test_update_password_valid_input(clear):
         'token' : response1.json()['token'],
         'password' : 'testchange',
     }
-    response2 = requests.put(f"{URL}/user/update/password", params=request_body2)
+    response2 = requests.put(f"{URL}/user/update/password", json=request_body2)
     # Empty dictionary is returned
     assert not response2.json()
 
@@ -41,7 +41,7 @@ def test_update_password_too_long(clear):
         'token' : response1.json()['token'],
         'password' : '1233456789123456789123456789',
     }
-    response2 = requests.put(f"{URL}/user/update/password", params=request_body2)
+    response2 = requests.put(f"{URL}/user/update/password", json=request_body2)
     # Input Error
     assert response2.status_code == InputError.code
 
@@ -60,7 +60,7 @@ def test_update_password_too_short(clear):
         'token' : response1.json()['token'],
         'password' : '1',
     }
-    response2 = requests.put(f"{URL}/user/update/password", params=request_body2)
+    response2 = requests.put(f"{URL}/user/update/password", json=request_body2)
     # Input Error
     assert response2.status_code == InputError.code
 
@@ -73,7 +73,7 @@ def test_update_password_bad_token(clear):
         'token' : 'badtoken',
         'password' : 'test1234',
     }
-    response = requests.put(f"{URL}/user/update/password", params=request_body)
+    response = requests.put(f"{URL}/user/update/password", json=request_body)
     # Input Error
     assert response.status_code == AccessError.code
 
