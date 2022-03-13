@@ -14,7 +14,7 @@ def test_invalid_token(clear):
     response = requests.post(f"{URL}/user/logout", json = request_body)
     assert response.status_code == 403
 
-def logout_twice(clear):
+def test_logout_twice(clear):
     '''
     log out twice. After first logout the token should be deactivated
     Then the second logout should fail.

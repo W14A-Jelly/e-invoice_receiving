@@ -80,19 +80,14 @@ def user_logout(token):
     if token_data == None:
         raise AccessError('Invalid token')
 
-    for user in Database.get_table('Login'):
-        if user.user_id == token_data['user_id']:
-            sessions = user.session_id
-            sessionList = sessions.split(' ', 1)
-            break
-    i = 0
-    for num in sessionList:        
-        if num == token_data['session_id']:
-            new_session_id = sessionList.pop(i)
-            break
-        i+=1
-    Database.update('Login', token_data['user_id'], {'session_id' : new_session_id})
+    user = Database.get_id('Login', token_data['user_id'])[0]
+    session = user.session_id
+    sessionList = session.split()
 
+    sessionList.remove(session)
+    new_session_id = ' '.join(sessionList)
+
+    Database.update('Login', token_data['user_id'], {'session_id' : new_session_id})
 
     return {}
 
