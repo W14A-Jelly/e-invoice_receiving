@@ -20,7 +20,13 @@ Usecase:
                                 'user_id' : 0})
     Database.update('Login', 0, {'password' :'newpassword',
                                     'email' : 'new@gmail.com'})
-    print(Database.get_id('Login', 0)[0].email) # 
+    print(Database.get('Login', 0)[0].email) # Would print 'new@gmail.com'
+
+    Database.insert('Ownership', {'user_id':0, 'xml_id':123})
+    Database.insert('Ownership', {'user_id':0, 'xml_id':234})
+    print(Database.get('Ownership', 0)[0].xml_id) # Would print 123
+    print(Database.get('Ownership', 0)[1].xml_id) # Would print 234
+
     Database.close()
 '''
 
