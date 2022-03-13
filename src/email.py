@@ -197,10 +197,38 @@ def email_output_report():
 
 def email_retrieve_end(token):
     '''
-    some description
+    description: Stop retrieving xml for the given token user
+    parameter:{token}
+    return value: {reports: []}
     '''
-    return {}
+    decode = decode_token(token)
+    if decode == None:
+        raise AccessError('bad token')
+    user_id = decode['user_id']
+    email_info = Database.get_id('Email',user_id)
+    if email_info == []:
+        raise AccessError("The user has no email credential for retrieving emails from")
+    elif email_info[0].is_retrieve == False:
+        raise AccessError("There is no active retrieving process")
+    else:
+        email.info[0].is_retrieve = True
+        updated = {
+            user_id: email.info[0].user_id
+            email_retrieve: email.info[0].email_retrieve
+            password: email.info[0].password
+            latest_xml_id: email.info[0].latest_xml_id
+            time_stamp: email.info[0].timestamp
+            is_retrieve: False
+            is_comm_report = email.info[0].is_comm_report
+
+
+        }
+        Database.update('Email', user_id, updated)
+        reports = report.return_reports()
+        report.clear_reports()
+    return {'reports':reports}
 
 
 if __name__ == '__main__':
     print(email_validate_xml('invoices/example1.xml'))
+
