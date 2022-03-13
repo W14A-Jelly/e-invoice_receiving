@@ -1,4 +1,3 @@
-
 from src.error import InputError, AccessError
 import imaplib
 import base64
@@ -7,17 +6,25 @@ import email
 import threading
 from datetime import datetime, timedelta, timezone
 from imbox import Imbox
-=======
-# from error import InputError, AccessError
+import report
+from src.database import Database
+from src.helper import decode_token
 from lxml import etree
 import os
 
-
-
 def email_set(token, email_address, email_pass):
-    '''
-    some description
-    '''
+    # validate email can be logged into
+    mail = imaplib.IMAP4_SSL("imap.gmail.com")
+    login_status, acc = mail.login(email_address, email_pass)
+    if login_status != 'OK':
+        raise AccessError(
+            'Could not update email, given credentials are invalid')
+    # Update database with new email and password
+    user_id = decode_token(token)['user_id']
+    Database.start()
+    updated_data = {'password': email_pass, 'email_receive': email_address}
+    Database.update('Email', user_id, updated_data)
+    Database.stop()
     return {}
 
 
@@ -28,7 +35,7 @@ def email_retrieve_start(token):
     returns; {}
     '''
     decode = decode_token(token)
-    if decode = None:
+    if decode == None:
         raise AccessError('Bad token')
     user_id = decode['email_address']
     # from the database, select email_receive, password and is_retrieve from email receive
@@ -36,7 +43,7 @@ def email_retrieve_start(token):
     email_receive = i.email_retrieve
     is_retrieve = i.is_retrieve
 
-    if is_retrieve = True():
+    if is_retrieve == True():
         raise AccessError('There is an active retrieving session already')
     params = [email_receive, password, datetime.now().replace(tzinfo=timezone.utc).timestamp(),user_id]
     t = threading.Thread(retrival2, params)
@@ -44,6 +51,7 @@ def email_retrieve_start(token):
     return {}
 
 
+'''
 def help_check_inbox(email_address, password,timestamp,user_id ):
     #DATABASE select is retrieve from email retrieve where email = email_address
     is_retrieve = Database.get_id('Email', user_id)[0].is_retrieve
@@ -54,14 +62,14 @@ def help_check_inbox(email_address, password,timestamp,user_id ):
     while is_retrieve == True:
         inbox_status, data = mail.select('Inbox')
         if inbox_status != 'OK':
-            raises AccessError("Cannot search inbox")
+            raise AccessError("Cannot search inbox")
         #loop through inboxes
         for count,mid in enumerate(data[0].split())
             message_status, msg_info = mail.fetch(mid, '(RFC822)')
             #m = email.message_from_string(msg_info[0][1])
             m = email.message_from_string(msg_info[0][1])
             # Not sure if the keyword need to be Date or Time, need to makeup a gmail for further test
-            if n = 0:
+            if n == 0:
                 # set latest email
                 email_info = Database.get_id('Email',user_id)
                 updated = {
@@ -76,7 +84,7 @@ def help_check_inbox(email_address, password,timestamp,user_id ):
             if timestamp > m['Date'].replace(tzinfo=timezone.utc).timestamp():
                 Database.update('Email', user_id, updated)
                 break
-            if mid = Database.get_id('Email',user_id)[0].latest_xml_id:
+            if mid == Database.get_id('Email',user_id)[0].latest_xml_id:
                 Database.update('Email', user_id, updated)
                 break
 
@@ -113,7 +121,7 @@ def help_check_inbox(email_address, password,timestamp,user_id ):
 
     mail.close()
     mail.logout()
-
+'''
 
 def retrival2(email_address, password,timestamp,user_id):
     is_retrieve = Database.get_id('Email', user_id)[0].is_retrieve
@@ -131,6 +139,7 @@ def retrival2(email_address, password,timestamp,user_id):
                 break
             for attachment in message.attachments:
                 if 'xml' in attachment['content-type']:
+                    file_name = attachment['filename']
                     rp_name = create_new(file_name)
                     data = attachment.get('content').read()
                     fp = os.path.join(os.getcwd(),'invoices', str(user_id),attachment['filename'])
@@ -139,7 +148,7 @@ def retrival2(email_address, password,timestamp,user_id):
                         f = open(fp,'wb')
                         f.write(data)
                         f.close()
-                        Database.insert('Ownership', {user_id: user_id, xml_id = file_name})
+                        Database.insert('Ownership', {'user_id': user_id, 'xml_id' : file_name})
                         d_successful = True
                     except:
                         report.update_unsuccessful(rp_name, f'failed to save %s',attachment['filename'])
@@ -173,6 +182,7 @@ def email_validate_xml(path_to_invoice):
         return False
 
 
+
     '''
     # Validate against schema, if invalid remove xml from invoices
     schema_root = etree.parse('src/xmlschema.xsl')
@@ -185,6 +195,7 @@ def email_validate_xml(path_to_invoice):
         return False
     '''
     return True
+
 
 
 def email_output_report():
@@ -201,6 +212,32 @@ def email_retrieve_end(token):
     parameter:{token}
     return value: {reports: []}
     '''
+
+if __name__ == '__main__':
+    Database.start()
+    Database.drop_tables()
+    Database.create_tables()
+    login_data = {'password': 'password',
+                  'email': 'exmaple@gmail.com',
+                  'session_id': '0 1',
+                  'user_id': 0}
+
+    Database.insert('Login', login_data)
+    data = {'user_id': '0',
+            'email_receive': 'test@gmail.com',
+            'password': 'test1234',
+            'latest_xml_id': 'xml_000',
+            'time_stamp': '1:24pm',
+            'is_retrieve': 'True',
+            'is_comm_report': 'True'
+            }
+    Database.insert('Email', data)
+    Database.print_table('Email')
+    updated_data = {'email_receive': 'testchanged@gmail.com',
+                    'password': 'testchanged'}
+    Database.update('Email', 0, updated_data)
+    Database.print_table('Email')
+
     decode = decode_token(token)
     if decode == None:
         raise AccessError('bad token')
@@ -231,4 +268,5 @@ def email_retrieve_end(token):
 
 if __name__ == '__main__':
     print(email_validate_xml('invoices/example1.xml'))
+
 

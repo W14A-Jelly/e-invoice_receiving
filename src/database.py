@@ -1,4 +1,4 @@
-from src.schema import db, Login, Email, Ownership
+from schema import db, Login, Email, Ownership
 
 '''
 Database class to manipulate table data and connect to SQLite server
@@ -106,9 +106,9 @@ class Database:
             case 'Email':
                 for record in table.select().order_by(table.user_id):
                     print(f'user_id: {record.user_id}')
-                    print(f'email_receieve: {record.email_receieve}')
+                    print(f'email_receive: {record.email_receive}')
                     print(f'password: {record.password}')
-                    print(f'latest_exml_id: {record.latest_exml_id}')
+                    print(f'latest_xml_id: {record.latest_xml_id}')
                     print(f'time_stamp: {record.time_stamp}')
                     print(f'is_retrieve: {record.is_retrieve}')
                     print(f'is_comm_report: {record.is_comm_report}')
