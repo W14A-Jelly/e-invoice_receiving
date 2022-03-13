@@ -5,9 +5,10 @@ from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 from src.error import InputError, AccessError
 from src import config
-from src.other import clear
+from src.clear import clear
 from src.user import user_register, user_login, user_logout, user_update_email, user_update_password
 from src.email import email_set, email_retrieve_start, email_retrieve_end
+from src.database import Database
 
 def quit_gracefully(*args):
     '''For coverage'''
@@ -45,13 +46,13 @@ def echo():
 def register_new_user():
     input = request.get_json()
 
-    return dumps(user_register(input['email_address'],input['password']))
+    return dumps(user_register(input['email'],input['password']))
 
 @APP.route("/user/login", methods=['POST'])
 def login_user():
     input = request.get_json()
 
-    return dumps(user_login(input['email_address'],input['password']))
+    return dumps(user_login(input['email'],input['password']))
 
 @APP.route("/user/logout", methods=['POST'])
 def logout_user():
@@ -63,7 +64,7 @@ def logout_user():
 @APP.route("/email/set", methods=['POST'])
 def set_business_email():
     input = request.get_json()
-    email_set(input['token'],input['email_address'], input['email_pass'])
+    email_set(input['token'],input['email'], input['email_pass'])
     return dumps({})
 
 @APP.route("/email/retrieve/start", methods=['PUT'])
@@ -99,17 +100,17 @@ def update_email():
 @APP.route("/user/update/password", methods=['PUT'])
 def update_password():
     input = request.get_json()
-    user_update_password(input['token'],input['email'])
+    user_update_password(input['token'],input['password'])
     
     return dumps({})
 
-@APP.route("/clear/v1", methods=['DELETE'])
+@APP.route("/clear", methods=['DELETE'])
 def data_clear():
     clear()
     return {}  
 
 if __name__ == "__main__":
-    signal.signal(signal.SIGINT, quit_gracefully) # For coverage
-    APP.run(port=config.port) # Do not edit this port
     Database.start()
     Database.create_tables()
+    signal.signal(signal.SIGINT, quit_gracefully) # For coverage
+    APP.run(port=config.port, debug=True) # Do not edit this port\

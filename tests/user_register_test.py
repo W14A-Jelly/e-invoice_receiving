@@ -93,12 +93,12 @@ def test_register_pass_edgecase(clear):
         'password' : 'a'*20,
     }
     response = requests.post(f"{URL}/user/register", json = request_body)
-    assert response.status_code == 400
+    assert response.status_code == 200
 
     request_body = {
         'email' : 'Hello2@gmail.com',
         'password' : 'a'*6,
     }
     response = requests.post(f"{URL}/user/register", json = request_body)
-    assert response.status_code == 400.
+    assert response.status_code == 200.
 

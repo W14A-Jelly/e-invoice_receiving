@@ -16,7 +16,7 @@ def test_clear_register(clear):
     response = requests.post(f"{URL}/user/register", json = request_body)
     assert response.status_code == 200
     
-    requests.put(f"{URL}/clear")
+    requests.delete(f"{URL}/clear")
     
     response = requests.post(f"{URL}/user/register", json = request_body)
     assert response.status_code == 200
@@ -32,7 +32,7 @@ def test_clear_login(clear):
     response = requests.post(f"{URL}/user/register", json = request_body)
     assert response.status_code == 200
     
-    requests.put(f"{URL}/clear")
+    requests.delete(f"{URL}/clear")
     
     response = requests.post(f"{URL}/user/login", json = request_body)
     assert response.status_code == InputError.code

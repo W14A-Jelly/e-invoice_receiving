@@ -1,8 +1,9 @@
-from database import Database
+from src.database import Database
 
 
 def clear():
     Database.drop_tables()
+    Database.create_tables()
 
 
 if __name__ == "__main__":

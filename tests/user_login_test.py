@@ -16,7 +16,7 @@ def test_help_create_user(clear):
     response = requests.post(f"{URL}/user/register", json = request_body)
     assert response.status_code == 200
 
-def test_successful_login(clear):
+def test_successful_login():
     '''
     Test successful login. Expect no errors.
     '''
