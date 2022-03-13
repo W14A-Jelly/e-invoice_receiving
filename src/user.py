@@ -2,13 +2,13 @@ from src.error import InputError, AccessError
 from src.database import Database
 from re import fullmatch
 
-def user_register(user_name, password, email_address):
+def user_register(email_address, password, ):
     '''
     some description
     '''
     return {'token' : 'Change this'}
 
-def user_login(user_name, password):
+def user_login(email_address, password):
     '''
     some description
     '''
@@ -49,12 +49,6 @@ def user_update_email(token, email):
         
     Database.update('Login', token.user_id, {'email' : email})
 
-    return {}
-
-def user_update_username(token, user_name):
-    '''
-    some description
-    '''
     return {}
 
 def user_update_password(token, password):
