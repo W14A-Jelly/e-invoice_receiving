@@ -46,7 +46,27 @@ def user_login(email_address, password):
     '''
     some description
     '''
-    return {'token' : 'Change this'}
+    validate = 0
+    all_email = [user.email for user in Database.get_table('Login')]
+    for email in all_email: 
+        if email == email_address:
+            validate = 1
+            break
+ 
+    for user in Database.get_table('Login'):
+        if user.email == email_address:
+            if user.password == password:
+                validate = 1
+                session = user.session_id
+                userID = user.user_id
+                Database.update('Login', userID, {'email' : email})
+                break
+    
+    if validate == 0:
+        raise InputError(description='Email not in the list or password is incorrect')
+
+    newToken = jwt.encode({'user_id': userID, 'session_id': session}, SECRET_KEY, algorithm='HS256')
+    return {'token' : newToken}
 
 def user_logout(token):
     '''
@@ -68,6 +88,7 @@ def user_logout(token):
             break
         i+=1
     Database.update('Login', token_data['user_id'], {'session_id' : new_session_id})
+
 
     return {}
 
