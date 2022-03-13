@@ -7,119 +7,98 @@ URL = f'http://127.0.0.1:{config.port}'
 # add clear to fixture later
 
 def register_successful(clear):
+    '''
+    Creates two users and test that generated tokens are unqiue. Expect no errors.
+    '''
     request_body = {
         'email' : 'Good@gmail.com',
         'password' : 'password',
-        'user_name' : 'HarryMan',
     }
-    response = requests.post(f"{URL}/auth/register/v2", json = request_body)
+    response = requests.post(f"{URL}/user/register", json = request_body)
     assert response.status_code == 200
     request_body = {
         'email' : 'Goodhi@gmail.com',
         'password' : 'password',
-        'user_name' : 'HarryWoman',
     }
-    response1 = requests.post(f"{URL}/auth/register/v2", json = request_body)
+    response1 = requests.post(f"{URL}/user/register", json = request_body)
     assert response1.status_code == 200
 
     assert response.json()['token'] != response1.json()['token']
 
 def test_register_email_invalid(clear):
+    '''
+    Test invalid emails in register. Expect InputError.
+    '''
     request_body = {
         'email' : 'InvalidEmail',
         'password' : 'password',
-        'user_name' : 'HarryMan1',
     }
-    response = requests.post(f"{URL}/auth/register/v2", json = request_body)
+    response = requests.post(f"{URL}/user/register", json = request_body)
     assert response.status_code == 400
 
     request_body = {
         'email' : 'InvalidEmail@',
         'password' : 'password',
-        'user_name' : 'HarryMan2',
     }
-    response = requests.post(f"{URL}/auth/register/v2", json = request_body)
+    response = requests.post(f"{URL}/user/register", json = request_body)
     assert response.status_code == 400
 
     request_body = {
         'email' : '@gmail.com',
         'password' : 'password',
-        'user_name' : 'HarryMan3',
     }
-    response = requests.post(f"{URL}/auth/register/v2", json = request_body)
+    response = requests.post(f"{URL}/user/register", json = request_body)
     assert response.status_code == 400
 
 def test_register_duplicate_email(clear):
+    '''
+    Test registered email. Expect InputError.
+    '''
     request_body = {
         'email' : 'Hello@gmail.com',
         'password' : 'password',
-        'user_name' : 'HarryMan',
     }
-    response = requests.post(f"{URL}/auth/register/v2", json = request_body)
+    response = requests.post(f"{URL}/user/register", json = request_body)
     request_body = {
         'email' : 'Hello@gmail.com',
         'password' : 'password',
-        'user_name' : 'HarryMan1',
     }
-    response = requests.post(f"{URL}/auth/register/v2", json = request_body)
+    response = requests.post(f"{URL}/user/register", json = request_body)
     
     assert response.status_code == 400
 
-
-def test_register_duplicate_username(clear):
+def test_pass_invalid(clear):
+    '''
+    Test when the password is more than 20 or less than 6 characters
+    '''
     request_body = {
-        'email' : 'Hello@gmail.com',
-        'password' : 'password',
-        'user_name' : 'HarryMan',
+        'email' : 'good@gmail.com',
+        'password' : 'ab',
     }
-    response = requests.post(f"{URL}/auth/register/v2", json = request_body)
+    response = requests.post(f"{URL}/user/register", json = request_body)
+    assert response.status_code == 400
     request_body = {
-        'email' : 'Hello1@gmail.com',
-        'password' : 'password',
-        'user_name' : 'HarryMan',
+        'email' : 'good@gmail.com',
+        'password' : 'a'*22,
     }
-    response = requests.post(f"{URL}/auth/register/v2", json = request_body)
-    
+    response = requests.post(f"{URL}/user/register", json = request_body)
     assert response.status_code == 400
 
-
-def test_register_duplicate_username_invalid(clear):
+def test_register_pass_edgecase(clear):
     '''
-    Test when the user name is longer than 20 or less than 6. It is not registered
-    '''
-    request_body = {
-        'email' : 'Hello1@gmail.com',
-        'password' : 'password',
-        'user_name' : 'a'*22,
-    }
-    response = requests.post(f"{URL}/auth/register/v2", json = request_body)
-    assert response.status_code == 400
-
-    request_body = {
-        'email' : 'Hello1@gmail.com',
-        'password' : 'password',
-        'user_name' : 'aa',
-    }
-    response = requests.post(f"{URL}/auth/register/v2", json = request_body)
-    assert response.status_code == 400.
-
-def test_register_username_edgecase():
-    '''
-    Test when the user name is exactly 6 or 20, which should be registered.
+    Test when the password length is exactly 6 or 20, which should be registered successfully.
     '''
     request_body = {
         'email' : 'Hello1@gmail.com',
-        'password' : 'password',
-        'user_name' : 'a'*20,
+        'password' : 'a'*20,
     }
-    response = requests.post(f"{URL}/auth/register/v2", json = request_body)
+    response = requests.post(f"{URL}/user/register", json = request_body)
     assert response.status_code == 400
 
     request_body = {
         'email' : 'Hello2@gmail.com',
-        'password' : 'password',
-        'user_name' : 'a'*6,
+        'password' : 'a'*6,
     }
-    response = requests.post(f"{URL}/auth/register/v2", json = request_body)
+    response = requests.post(f"{URL}/user/register", json = request_body)
     assert response.status_code == 400.
 

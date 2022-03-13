@@ -1,3 +1,4 @@
+
 from src.error import InputError, AccessError
 import imaplib
 import base64
@@ -6,11 +7,19 @@ import email
 import threading
 from datetime import datetime, timedelta, timezone
 from imbox import Imbox
+=======
+# from error import InputError, AccessError
+from lxml import etree
+import os
+
+
+
 def email_set(token, email_address, email_pass):
     '''
     some description
     '''
     return {}
+
 
 def email_retrieve_start(token):
     '''
@@ -33,6 +42,7 @@ def email_retrieve_start(token):
     t = threading.Thread(retrival2, params)
     t.start()
     return {}
+
 
 def help_check_inbox(email_address, password,timestamp,user_id ):
     #DATABASE select is retrieve from email retrieve where email = email_address
@@ -151,12 +161,31 @@ def retrival2(email_address, password,timestamp,user_id):
                     else:
                         report.update_unsuccessful(rp_name, f'%s Not UBL standard', attachment['filename'])'''
 
-def email_validate_xml():
-    # module to email_retrieve_start
+
+def email_validate_xml(path_to_invoice):
+
+    # Validate well-formedness, if invalid remove xml from invoices
+    try:
+        invoice_root = etree.parse(path_to_invoice)
+
+    except etree.XMLSyntaxError:
+        os.remove(path_to_invoice)
+        return False
+
+
     '''
-    some description
+    # Validate against schema, if invalid remove xml from invoices
+    schema_root = etree.parse('src/xmlschema.xsl')
+    xmlschema = etree.XMLSchema(schema_root)
+    try:
+        xmlschema.assertValid(invoice_root)
+
+    except etree.DocumentInvalid:
+        os.remove(path_to_invoice)
+        return False
     '''
-    return {}
+    return True
+
 
 def email_output_report():
     # module to email_retrieve_start
@@ -165,8 +194,13 @@ def email_output_report():
     '''
     return {}
 
+
 def email_retrieve_end(token):
     '''
     some description
     '''
     return {}
+
+
+if __name__ == '__main__':
+    print(email_validate_xml('invoices/example1.xml'))
