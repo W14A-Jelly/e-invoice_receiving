@@ -296,7 +296,10 @@ disable=blacklisted-name,
         xreadlines-attribute,
         deprecated-sys-function,
         exception-escape,
-        comprehension-escape
+        comprehension-escape,
+        raise-missing-from,
+        no-method-argument,
+        no-self-argument
 
 # Enable the message, report, category or checker with the given id(s). You can
 # either give multiple identifier separated by comma (,) or put this option
@@ -326,8 +329,6 @@ enable=syntax-error,
        misplaced-format-function,
        method-hidden,
        access-member-before-definition,
-       no-method-argument,
-       no-self-argument,
        invalid-slots-object,
        assigning-non-slot,
        invalid-slots,
