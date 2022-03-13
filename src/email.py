@@ -18,26 +18,19 @@ def email_retrieve_start(token):
 
 
 def email_validate_xml(path_to_invoice):
-
-    # Validate well-formedness, if invalid remove xml from invoices
     try:
+        # Validate well-formedness
         invoice_root = etree.parse(path_to_invoice)
+        # Validate against schema
+        schema_root = etree.parse('src/xmlschema.xsl')
+        # xmlschema = etree.XMLSchema(schema_root)
+        # xmlschema.assertValid(invoice_root)
 
-    except etree.XMLSyntaxError:
+    # if invalid, remove from invoices directory
+    except (etree.XMLSyntaxError, etree.DocumentInvalid):
         os.remove(path_to_invoice)
         return False
 
-    '''
-    # Validate against schema, if invalid remove xml from invoices
-    schema_root = etree.parse('src/xmlschema.xsl')
-    xmlschema = etree.XMLSchema(schema_root)
-    try:
-        xmlschema.assertValid(invoice_root)
-
-    except etree.DocumentInvalid:
-        os.remove(path_to_invoice)
-        return False
-    '''
     return True
 
 
