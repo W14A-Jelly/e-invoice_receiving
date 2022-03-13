@@ -1,4 +1,4 @@
-from schema import db, Login, Email, Ownership
+from src.schema import db, Login, Email, Ownership
 
 '''
 Database class to manipulate table data and connect to SQLite server

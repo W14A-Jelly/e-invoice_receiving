@@ -5,7 +5,7 @@ from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 from src.error import InputError, AccessError
 from src import config
-from src.other import clear_v1
+from src.other import clear
 from src.user import user_register, user_login, user_logout, user_update_email, user_update_password
 from src.email import email_set, email_retrieve_start, email_retrieve_end
 
