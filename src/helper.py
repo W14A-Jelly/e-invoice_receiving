@@ -23,7 +23,8 @@ def decode_token(token):
     except:
         return None
     
-    if decode_data['user_id'] in users and decode_data['session_id'] == session:
+    session = session.split(' ', 1)
+    if decode_data['user_id'] in users and decode_data['session_id'] in session:
         return {'user_id': decode_data['user_id'], 
                 'session_id': decode_data['session_id']}
     
