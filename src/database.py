@@ -1,4 +1,4 @@
-from src.schema import db, Login, Email, Ownership
+from schema import db, Login, Email, Ownership
 
 '''
 Database class to manipulate table data and connect to SQLite server
@@ -20,9 +20,16 @@ Usecase:
                                 'user_id' : 0})
     Database.update('Login', 0, {'password' :'newpassword',
                                     'email' : 'new@gmail.com'})
-    print(Database.get_id('Login', 0)[0].email) # 
+    print(Database.get('Login', 0)[0].email) # Would print 'new@gmail.com'
+
+    Database.insert('Ownership', {'user_id':0, 'xml_id':123})
+    Database.insert('Ownership', {'user_id':0, 'xml_id':234})
+    print(Database.get('Ownership', 0)[0].xml_id) # Would print 123
+    print(Database.get('Ownership', 0)[1].xml_id) # Would print 234
+
     Database.close()
 '''
+
 
 def find_table(table):
     match table:
@@ -32,6 +39,7 @@ def find_table(table):
             return Email
         case 'Ownership':
             return Ownership
+
 
 class Database:
     def start():
@@ -58,12 +66,12 @@ class Database:
     def update(table, id, data):
         # Update existing record in a table via user_id
         table = find_table(table)
-        table.update(data).where(table.user_id==id).execute()
+        table.update(data).where(table.user_id == id).execute()
 
     def get_id(table, id):
         # Returns a list of rows in a table with given user_id
         table = find_table(table)
-        query = table.select().where(table.user_id==id).order_by(table.user_id)
+        query = table.select().where(table.user_id == id).order_by(table.user_id)
         return [row for row in query]
 
     def get_table(table):
@@ -84,7 +92,8 @@ class Database:
         symb = '-'
         num_symb = 20
 
-        print(symb * int(num_symb / 2) + f'|{name}|' + symb * int(num_symb / 2))
+        print(symb * int(num_symb / 2) +
+              f'|{name}|' + symb * int(num_symb / 2))
         match name:
             case 'Login':
                 for record in table.select().order_by(table.user_id):
@@ -109,12 +118,13 @@ class Database:
                 for record in table.select().order_by(table.user_id):
                     print(f'user_id: {record.user_id}')
                     print(f'xml_id: {record.xml_id}')
-                    print(symb * (num_symb + len(name) + 2))            
+                    print(symb * (num_symb + len(name) + 2))
+
 
 if __name__ == "__main__":
     # Debug Database
-    #Database.start()
-    #Database.create_tables()
+    # Database.start()
+    # Database.create_tables()
     '''
     login_data = {'password' : 'password',
                             'email' : 'exmaple2@gmail.com', 
@@ -126,8 +136,8 @@ if __name__ == "__main__":
     #Database.insert('Ownership', {'user_id':0, 'xml_id':124})
     #data = {'password' :'newpassword', 'email' : 'new2@gmail.com'}
     #Database.update('Login', 0, data)
-    #Database.drop_tables()
+    # Database.drop_tables()
     #print(Database.get_id('Login', 0)[0].email)
-    #print(Database.get_table('Login')[1].user_id)
-    #Database.print_table('Login')
-    #Database.stop()
+    # print(Database.get_table('Login')[1].user_id)
+    # Database.print_table('Login')
+    # Database.stop()
