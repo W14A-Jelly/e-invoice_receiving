@@ -1,14 +1,15 @@
 from src.error import InputError, AccessError
 from src.database import Database
 from src.helper import decode_token
+from re import fullmatch
 
-def user_register(user_name, password, email_address):
+def user_register(email_address, password, ):
     '''
     some description
     '''
     return {'token' : 'Change this'}
 
-def user_login(user_name, password):
+def user_login(email_address, password):
     '''
     some description
     '''
@@ -22,14 +23,33 @@ def user_logout(token):
 
 def user_update_email(token, email):
     '''
-    some description
-    '''
-    return {}
+    Change pre-existing email to the the given email.
 
-def user_update_username(token, user_name):
+    Arguments:
+        token (string) - An encoded string.
+        email (string) - Valid email structure with @.
+
+    Exceptions:
+        AccessError: Invalid token.
+        InputError: Invalid email format, Email address already used.
+
+    Return Value:
+        Returns an empty dictionary on successful request.
     '''
-    some description
-    '''
+    regex = r'^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$'
+    
+    # TODO Get user_id
+    if token == 'not valid':
+        return AccessError('Invalid token')
+    elif fullmatch(regex, email) == None:
+        return InputError('Invalid email format')
+
+    all_email = [user.email for user in Database.get_table('Login')]
+    if email in all_email:
+        raise InputError('Email address already used')
+        
+    Database.update('Login', token.user_id, {'email' : email})
+
     return {}
 
 def user_update_password(token, password):
