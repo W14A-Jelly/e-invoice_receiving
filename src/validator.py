@@ -1,14 +1,13 @@
 from lxml import etree
 
 
-class Validator:
+class ReportValidator:
 
     def __init__(self):
-        xmlschema_doc = etree.parse('XMLSchema.xsl')
-        self.xmlschema = etree.XMLSchema(xmlschema_doc)
+        XML_schema_tree = etree.parse('src/XMLSchema.xsl')
+        self.validator = etree.XMLSchema(XML_schema_tree)
 
-    def validate(self, xml_path):
-        xml_doc = etree.parse(xml_path)
-        result = self.xmlschema.validate(xml_doc)
-
-        return result
+    def validate(self, report_path):
+        report_tree = etree.parse(report_path)
+        validity = self.validator.validate(report_tree)
+        return validity
