@@ -1,5 +1,6 @@
 from src.error import InputError, AccessError
 from src.database import Database
+from src.helper import decode_token
 from re import fullmatch
 
 def user_register(email_address, password, ):
@@ -67,12 +68,12 @@ def user_update_password(token, password):
         Returns an empty dictionary on successful request.
 
     '''
-    # TODO Get user_id
-    if token == 'not valid':
+    token_data = decode_token(token)
+    if token_data == None:
         return AccessError('Invalid token')
     elif not (len(password) >= 6 and len(password) <= 20):
         return InputError('Password is not between length 6 to 20 inclusive')
 
-    Database.update('Login', token.user_id, {'password' : password})
+    Database.update('Login', token_data['user_id'], {'password' : password})
 
     return {}
