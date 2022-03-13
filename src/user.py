@@ -2,6 +2,7 @@ from src.error import InputError, AccessError
 from src.database import Database
 from src.helper import decode_token
 from re import fullmatch
+from src.helper import decode_token
 
 def user_register(email_address, password, ):
     '''
@@ -38,8 +39,8 @@ def user_update_email(token, email):
     '''
     regex = r'^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$'
     
-    # TODO Get user_id
-    if token == 'not valid':
+    token_data = decode_token(token)
+    if token_data == None:
         return AccessError('Invalid token')
     elif fullmatch(regex, email) == None:
         return InputError('Invalid email format')
@@ -48,7 +49,7 @@ def user_update_email(token, email):
     if email in all_email:
         raise InputError('Email address already used')
         
-    Database.update('Login', token.user_id, {'email' : email})
+    Database.update('Login', token_data['user_id'], {'email' : email})
 
     return {}
 
