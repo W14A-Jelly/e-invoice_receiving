@@ -60,7 +60,7 @@ def test_update_email_already_exists(clear):
         'email' : 'testInUse@gmail.com',
         'password' : 'test1234',
     }
-    response2 = requests.post(f"{URL}/user/register", json=request_body2)
+    requests.post(f"{URL}/user/register", json=request_body2)
     # Update their email to email of second user
     request_body3 = {
         'token' : response1.json()['token'],

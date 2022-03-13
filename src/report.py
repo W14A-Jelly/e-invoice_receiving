@@ -15,7 +15,7 @@ def create_new(invoice_id):
         'error': '-',
     }
     # Create new JSON file containing report template
-    with open(report_name, 'w') as f:
+    with open(report_name, 'w', encoding="utf-8") as f:
         json.dump(template, f)
         f.close()
     # Return the file's name
@@ -25,7 +25,7 @@ def create_new(invoice_id):
 
 
 def update_successful(report_name):
-    with open(report_name, 'r+') as f:
+    with open(report_name, 'r+', encoding="utf-8") as f:
         data = json.load(f)
         data['status'] = 'success'
         data['error'] = 'none'
@@ -38,7 +38,7 @@ def update_successful(report_name):
 
 
 def update_unsuccessful(report_name, error_msg):
-    with open(report_name, 'r+') as f:
+    with open(report_name, 'r+', encoding="utf-8") as f:
         data = json.load(f)
         data['status'] = 'unsuccessful'
         data['error'] = error_msg
@@ -54,7 +54,7 @@ def return_reports():
     all_reports = []
     directory = 'reports'
     for report in os.listdir(directory):
-        with open(os.path.join(directory, report), 'r') as f:
+        with open(os.path.join(directory, report), 'r', encoding="utf-8") as f:
             data = json.load(f)
             all_reports.append(data)
     return all_reports
