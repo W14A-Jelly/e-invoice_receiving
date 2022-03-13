@@ -1,6 +1,3 @@
-'''
-some description
-'''
 import sys
 import signal
 from json import dumps
@@ -9,7 +6,8 @@ from flask_cors import CORS
 from src.error import InputError, AccessError
 from src import config
 from src.other import clear_v1
-# add imports for all route files
+from src.user import user_register, user_login, user_logout, user_update_email, user_update_password
+from src.email import email_set, email_retrieve_start, email_retrieve_end
 
 def quit_gracefully(*args):
     '''For coverage'''
@@ -65,39 +63,43 @@ def logout_user():
 @APP.route("/email/set", methods=['POST'])
 def set_business_email():
     input = request.get_json()
-    function_name(input['token'],input['email_address'], input['email_pass'])
+    email_set(input['token'],input['email_address'], input['email_pass'])
     return dumps({})
 
 @APP.route("/email/retrieve/start", methods=['PUT'])
 def start_api():
     input = request.get_json()
-    function_name2(input['token'])
+    email_retrieve_start(input['token'])
     return dumps({})
 
 @APP.route("/email/retrieve/end", methods=['PUT'])
 def end_api():
     input = request.get_json()
-    function_name3(input['token'])
+    email_retrieve_end(input['token'])
     return dumps({})
 
+'''
 @APP.route("/invoice/upload", methods=['GET'])
 def upload_xml():
-    input = request.get_json()
-    report = function_name4(input['token'],input['XML_body'])
+    # TODO
+    token = request.args.get('token')
+    XML_body = request.args.get('XML_body')
+    report = function_name4(token, XML_body)
 
     return dumps({"invoice_report": report})
+'''
 
 @APP.route("/user/update/email", methods=['PUT'])
 def update_email():
     input = request.get_json()
-    function_name5(input['token'],input['email'])
+    user_update_email(input['token'],input['email'])
     
     return dumps({})
 
 @APP.route("/user/update/password", methods=['PUT'])
 def update_password():
     input = request.get_json()
-    function_name6(input['token'],input['email'])
+    user_update_password(input['token'],input['email'])
     
     return dumps({})
 
