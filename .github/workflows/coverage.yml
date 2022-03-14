@@ -20,6 +20,7 @@ jobs:
         pip install pytest
     - name: Analysing the code with pylint
       run: |
+        pip install -r requirements.txt
         coverage run -m src.server >& $SERVER_LOG &
         pytest tests/
         kill -SIGINT %1
