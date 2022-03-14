@@ -24,5 +24,25 @@ setup(
             'requests==2.27.1',
             'Werkzeug==2.0.3',
             'wrapt==1.13.3'
-            ]
+            ],
+    dependency_links=[
+            'git+https://github.com/W14A-Jelly/e-invoice_receiving@main#egg=coverage',
+            'git+https://github.com/W14A-Jelly/e-invoice_receiving@main#egg=Flask',
+            'git+https://github.com/W14A-Jelly/e-invoice_receiving@main#egg=Flask-Cors',
+            'git+https://github.com/W14A-Jelly/e-invoice_receiving@main#egg=imbox'
+            'git+https://github.com/W14A-Jelly/e-invoice_receiving@main#egg=jwt'
+            'git+https://github.com/W14A-Jelly/e-invoice_receiving@main#egg=lxml'
+            'git+https://github.com/W14A-Jelly/e-invoice_receiving@main#egg=peewee'
+            'git+https://github.com/W14A-Jelly/e-invoice_receiving@main#egg=py'
+            'git+https://github.com/W14A-Jelly/e-invoice_receiving@main#egg=pybase64'
+            'git+https://github.com/W14A-Jelly/e-invoice_receiving@main#egg=pycparser'
+            'git+https://github.com/W14A-Jelly/e-invoice_receiving@main#egg=PyJWT'
+            'git+https://github.com/W14A-Jelly/e-invoice_receiving@main#egg=pylint'
+            'git+https://github.com/W14A-Jelly/e-invoice_receiving@main#egg=pyparsing'
+            'git+https://github.com/W14A-Jelly/e-invoice_receiving@main#egg=pytest'
+            'git+https://github.com/W14A-Jelly/e-invoice_receiving@main#egg=pytest-cov'
+            'git+https://github.com/W14A-Jelly/e-invoice_receiving@main#egg=requests'
+            'git+https://github.com/W14A-Jelly/e-invoice_receiving@main#egg=Werkzeug'
+            'git+https://github.com/W14A-Jelly/e-invoice_receiving@main#egg=wrapt'
+    ]
 )
