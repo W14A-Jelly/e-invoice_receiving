@@ -193,13 +193,16 @@ def retrival2(email_address, password, timestamp, user_id):
                                       f"{user_id}_{attachment['filename']}")
 
                     d_successful = False
+                    try:
+                        with open(fp, 'wb') as f:
+                            f.write(data)
 
-                    with open(fp, 'wb') as f:
-                        f.write(data)
-
-                    Database.insert(
-                        'Ownership', {'user_id': user_id, 'xml_id': file_name})
-                    d_successful = True
+                        Database.insert(
+                            'Ownership', {'user_id': user_id, 'xml_id': file_name})
+                        d_successful = True
+                    except:
+                        param = f'%s Failed to save', attachment['filename']
+                        report.update_unsuccessful(rp_name, param)
 
                     if d_successful == True:
                         valid = email_validate_xml(fp)
