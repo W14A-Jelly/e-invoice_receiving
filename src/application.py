@@ -28,15 +28,15 @@ def defaultHandler(err):
     return response
 
 
-APP = Flask(__name__)
-CORS(APP)
+application = Flask(__name__)
+CORS(application)
 
-APP.config['TRAP_HTTP_EXCEPTIONS'] = True
-APP.register_error_handler(Exception, defaultHandler)
+application.config['TRAP_HTTP_EXCEPTIONS'] = True
+application.register_error_handler(Exception, defaultHandler)
 
 # Example
 '''
-@APP.route("/echo", methods=['GET'])
+@application.route("/echo", methods=['GET'])
 def echo():
     data = request.args.get('data')
     if data == 'echo':
@@ -47,20 +47,20 @@ def echo():
 '''
 
 
-@APP.route("/user/register", methods=['POST'])
+@application.route("/user/register", methods=['POST'])
 def register_new_user():
     input = request.get_json()
     return dumps(user_register(input['email'], input['password']))
 
 
-@APP.route("/user/login", methods=['POST'])
+@application.route("/user/login", methods=['POST'])
 def login_user():
     input = request.get_json()
 
     return dumps(user_login(input['email'], input['password']))
 
 
-@APP.route("/user/logout", methods=['POST'])
+@application.route("/user/logout", methods=['POST'])
 def logout_user():
     input = request.get_json()
     user_logout(input['token'])
@@ -68,21 +68,21 @@ def logout_user():
     return dumps({})
 
 
-@APP.route("/email/set", methods=['POST'])
+@application.route("/email/set", methods=['POST'])
 def set_business_email():
     input = request.get_json()
     email_set(input['token'], input['email'], input['email_pass'])
     return dumps({})
 
 
-@APP.route("/email/retrieve/start", methods=['PUT'])
+@application.route("/email/retrieve/start", methods=['PUT'])
 def start_api():
     input = request.get_json()
     email_retrieve_start(input['token'])
     return dumps({})
 
 
-@APP.route("/email/retrieve/end", methods=['PUT'])
+@application.route("/email/retrieve/end", methods=['PUT'])
 def end_api():
     input = request.get_json()
     reports = email_retrieve_end(input['token'])
@@ -90,7 +90,7 @@ def end_api():
 
 
 '''
-@APP.route("/invoice/upload", methods=['GET'])
+@application.route("/invoice/upload", methods=['GET'])
 def upload_xml():
     # TODO
     token = request.args.get('token')
@@ -101,7 +101,7 @@ def upload_xml():
 '''
 
 
-@APP.route("/user/update/email", methods=['PUT'])
+@application.route("/user/update/email", methods=['PUT'])
 def update_email():
     input = request.get_json()
     user_update_email(input['token'], input['email'])
@@ -109,7 +109,7 @@ def update_email():
     return dumps({})
 
 
-@APP.route("/user/update/password", methods=['PUT'])
+@application.route("/user/update/password", methods=['PUT'])
 def update_password():
     input = request.get_json()
     user_update_password(input['token'], input['password'])
@@ -117,7 +117,7 @@ def update_password():
     return dumps({})
 
 
-@APP.route("/clear", methods=['DELETE'])
+@application.route("/clear", methods=['DELETE'])
 def data_clear():
     clear()
     return {}
@@ -127,4 +127,4 @@ if __name__ == "__main__":
     Database.start()
     Database.create_tables()
     signal.signal(signal.SIGINT, quit_gracefully)  # For coverage
-    APP.run(port=config.port, debug=False)  # Do not edit this port\
+    application.run(port=config.port, debug=False)  # Do not edit this port\
