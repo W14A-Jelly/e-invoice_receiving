@@ -32,6 +32,7 @@ Usecase:
 
 
 def find_table(table):
+    '''
     match table:
         case 'Login':
             return Login
@@ -39,6 +40,14 @@ def find_table(table):
             return Email
         case 'Ownership':
             return Ownership
+    '''
+    # v3.8
+    if table == 'Login':
+        return Login
+    elif table == 'Email':
+        return Email
+    elif table == 'Ownership':
+        return Ownership
 
 
 class Database:
@@ -94,6 +103,7 @@ class Database:
 
         print(symb * int(num_symb / 2) +
               f'|{name}|' + symb * int(num_symb / 2))
+        '''
         match name:
             case 'Login':
                 for record in table.select().order_by(table.user_id):
@@ -119,6 +129,32 @@ class Database:
                     print(f'user_id: {record.user_id}')
                     print(f'xml_id: {record.xml_id}')
                     print(symb * (num_symb + len(name) + 2))
+        '''
+        # v3.8
+        if name == 'Login':
+            for record in table.select().order_by(table.user_id):
+                print(f'user_id: {record.user_id}')
+                print(f'email: {record.email}')
+                print(f'password: {record.password}')
+                print(f'session_id: {record.session_id}')
+                print(symb * (num_symb + len(name) + 2))
+
+        elif name == 'Email':
+            for record in table.select().order_by(table.user_id):
+                print(f'user_id: {record.user_id}')
+                print(f'email_receive: {record.email_receive}')
+                print(f'password: {record.password}')
+                print(f'latest_xml_id: {record.latest_xml_id}')
+                print(f'time_stamp: {record.time_stamp}')
+                print(f'is_retrieve: {record.is_retrieve}')
+                print(f'is_comm_report: {record.is_comm_report}')
+                print(symb * (num_symb + len(name) + 2))
+
+        elif name == 'Ownership':
+            for record in table.select().order_by(table.user_id):
+                print(f'user_id: {record.user_id}')
+                print(f'xml_id: {record.xml_id}')
+                print(symb * (num_symb + len(name) + 2))
 
 
 if __name__ == "__main__":
