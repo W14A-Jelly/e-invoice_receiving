@@ -123,6 +123,11 @@ def data_clear():
     return {}
 
 
+@application.route("/", methods=['GET'])
+def home():
+    return dumps({})
+
+
 if __name__ == "__main__":
     Database.start()
     Database.create_tables()
