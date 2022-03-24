@@ -19,15 +19,12 @@ jobs:
         pip install coverage
         pip install -r requirements.txt
         
-    - name: Launch Server
-      run: |
-        SERVER_LOG=$(mktemp)
-        coverage run -m src.server >& $SERVER_LOG &
-        pylint tests/
-    
     - name: Analysing the code with pylint
       run: |
+        coverage run -m src.server >& $SERVER_LOG &
+        pylint tests/
         kill -SIGINT %1
         cat $SERVER_LOG
         coverage report
         coverage html
+        
