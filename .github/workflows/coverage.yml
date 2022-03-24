@@ -21,7 +21,7 @@ jobs:
         
     - name: Launch Server
       run: |
-        coverage run -m src.server
+        coverage run -m src.server >& $SERVER_LOG &
         pylint tests/
     
     - name: Analysing the code with pylint
