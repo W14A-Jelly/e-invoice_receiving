@@ -23,8 +23,8 @@ jobs:
       run: |
         coverage run -m src.server
         pylint tests/
-
-     - name: Analysing the code with pylint
+    
+    - name: Analysing the code with pylint
       run: |
         kill -SIGINT %1
         coverage report
