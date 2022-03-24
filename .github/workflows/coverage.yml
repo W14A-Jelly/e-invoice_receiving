@@ -19,8 +19,7 @@ jobs:
         pip install -r requirements.txt
     - name: Analysing the code with pylint
       run: |
-        coverage run -m src.server >& $SERVER_LOG &
-        pytest tests/
+        coverage run -m src.server
         kill -SIGINT %1
         cat $SERVER_LOG
         coverage report
