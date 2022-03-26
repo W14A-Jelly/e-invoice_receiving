@@ -9,7 +9,7 @@ from src.clear import clear
 from src.user import user_register, user_login, user_logout, user_update_email, user_update_password
 from src.email import email_set, email_retrieve_start, email_retrieve_end
 from src.database import Database
-
+from src.error import InputError, AccessError
 
 def quit_gracefully(*args):
     '''For coverage'''
@@ -40,12 +40,14 @@ APP.register_error_handler(Exception, defaultHandler)
 def echo():
     data = request.args.get('data')
     if data == 'echo':
-   	    raise InputError(description='Cannot echo "echo"')
+        raise InputError(description='Cannot echo "echo"')
     return dumps({
         'data': data
     })
 '''
-
+@APP.route("/", methods=['GET'])
+def defaultpath():
+    return ('API document available at https://app.swaggerhub.com/apis/Jelly6/E-invoice-receiving-api/1.0.0#/')
 
 @APP.route("/user/register", methods=['POST'])
 def register_new_user():
@@ -119,8 +121,13 @@ def update_password():
 
 @APP.route("/clear", methods=['DELETE'])
 def data_clear():
-    clear()
-    return {}
+    try:
+        assert 'Jelly2022' == request.get_json()['admin_pass']
+        clear()
+        return {}
+    except:
+        raise AccessError('Not authorised')
+        return {}
 
 
 if __name__ == "__main__":
