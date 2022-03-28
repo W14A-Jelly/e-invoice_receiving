@@ -216,7 +216,7 @@ def retrival2(email_address, password, timestamp, user_id):
                         else:
                             report.update_successful(rp_name)
                             info = xml_extract(fp)
-                            data = {'user_id' : user_id, xml_id : attachment['filename'], sender: info['sender'], time: info['time'], price : info['price']}
+                            data = {'user_id' : user_id, 'xml_id' : attachment['filename'], 'sender': info['sender'], 'time': info['time'], 'price' : info['price']}
                             Database.insert('Ownership', data)
 
         is_retrieve = Database.get_id('Email', user_id)[0].is_retrieve
