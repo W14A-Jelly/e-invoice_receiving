@@ -1,4 +1,4 @@
-from src.schema import db, Login, Email, Ownership
+from src.schema import db, Login, Email, SMS, Ownership, Blacklist
 
 '''
 Database class to manipulate table data and connect to SQLite server
@@ -37,9 +37,12 @@ def find_table(table):
             return Login
         case 'Email':
             return Email
+        case 'SMS':
+            return SMS
         case 'Ownership':
             return Ownership
-
+        case 'Blacklist':
+            return Blacklist
 
 class Database:
     def start():
@@ -52,11 +55,11 @@ class Database:
 
     def create_tables():
         # Create new tables defined in schema.py if tables not exist.
-        db.create_tables([Login, Email, Ownership], safe=True)
+        db.create_tables([Login, Email, SMS, Ownership, Blacklist], safe=True)
 
     def drop_tables():
         # Delete all existing tables if tables exist.
-        db.drop_tables([Login, Email, Ownership], safe=True)
+        db.drop_tables([Login, Email, SMS, Ownership, Blacklist], safe=True)
 
     def insert(table, data):
         # Insert or bulk insert a new record into a table
@@ -102,6 +105,11 @@ class Database:
                     print(f'password: {record.password}')
                     print(f'session_id: {record.session_id}')
                     print(symb * (num_symb + len(name) + 2))
+            case 'SMS':
+                for record in table.select().order_by(table.user_id):
+                    print(f'user_id: {record.user_id}')
+                    print(f'sms_number: {record.sms_number}')
+                    print(symb * (num_symb + len(name) + 2))
 
             case 'Email':
                 for record in table.select().order_by(table.user_id):
@@ -118,6 +126,15 @@ class Database:
                 for record in table.select().order_by(table.user_id):
                     print(f'user_id: {record.user_id}')
                     print(f'xml_id: {record.xml_id}')
+                    print(f'sender: {record.sender}')
+                    print(f'time: {record.time}')
+                    print(f'price: {record.price}')
+                    print(symb * (num_symb + len(name) + 2))
+
+            case 'Blacklist':
+                for record in table.select().order_by(table.user_id):
+                    print(f'user_id: {record.user_id}')
+                    print(f'ignore: {record.ignore}')
                     print(symb * (num_symb + len(name) + 2))
 
 
