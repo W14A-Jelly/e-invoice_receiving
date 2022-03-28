@@ -9,7 +9,7 @@ def clear():
     '''
     Clears database data
     '''
-    requests.delete(f"{URL}/clear")
+    requests.delete(f"{URL}/clear", json = {'admin_pass' : 'Jelly2022'})
 
 @pytest.fixture
 def user_1():
