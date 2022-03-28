@@ -203,12 +203,16 @@ def retrival2(email_address, password, timestamp, user_id):
                     except:
                         param = f'%s Failed to save', attachment['filename']
                         report.update_unsuccessful(rp_name, param)
+                        report.email_error_report(
+                            fp, rp_name, "se2y22g32@gmail.com", email_address)
 
                     if d_successful == True:
                         valid = email_validate_xml(fp)
                         if valid == False:
                             param = f'%s Not UBL standard', attachment['filename']
                             report.update_unsuccessful(rp_name, param)
+                            report.email_error_report(
+                                fp, rp_name, "se2y22g32@gmail.com", email_address)
                             os.remove(fp)
                         else:
                             report.update_successful(rp_name)
