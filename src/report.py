@@ -140,7 +140,7 @@ def email_error_report(path_to_XML, path_to_report, receiver_email, client_email
         server.sendmail(sender_email, receiver_email, text)
 
 
-if __name__ == "__main__":
+# if __name__ == "__main__":
     # report1 = create_new(1)
     # update_successful(report1)
 
