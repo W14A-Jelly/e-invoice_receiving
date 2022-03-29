@@ -64,9 +64,10 @@ def return_reports():
     all_reports = []
     directory = 'reports'
     for report in os.listdir(directory):
-        with open(os.path.join(directory, report), 'r', encoding="utf-8") as f:
-            data = json.load(f)
-            all_reports.append(data)
+        if report != "README.txt":
+            with open(os.path.join(directory, report), 'r', encoding="utf-8") as f:
+                data = json.load(f)
+                all_reports.append(data)
     return all_reports
 
 # Clears all reports from the reports folder
@@ -140,14 +141,14 @@ def email_error_report(path_to_XML, path_to_report, receiver_email, client_email
 
 
 if __name__ == "__main__":
-    report1 = create_new(1)
+    # report1 = create_new(1)
     # update_successful(report1)
 
     # report2 = create_new(2)
     # update_unsuccessful(report2, 'invalid UBL format')
 
-    all_reports = return_reports()
-    print(all_reports)
+    # all_reports = return_reports()
+    # print(all_reports)
 
     # clear_reports()
     # email_error_report("invoices/example.xml", "reports/invoice_1_report.json", 'se2y22g32@gmail.com', "client@gmail.com")
