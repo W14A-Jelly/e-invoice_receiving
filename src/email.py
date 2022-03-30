@@ -200,8 +200,6 @@ def retrival2(email_address, password, timestamp, user_id):
                         with open(fp, 'wb') as f:
                             f.write(data)
 
-                        Database.insert(
-                            'Ownership', {'user_id': user_id, 'xml_id': file_name})
                         d_successful = True
                     except:
                         param = f'%s Failed to save', attachment['filename']
