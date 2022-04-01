@@ -29,6 +29,17 @@ class Email(Entity):
     is_retrieve = pw.BooleanField(default=False)
     is_comm_report = pw.BooleanField(default=False)
 
+class SMS(Entity):
+    user_id = pw.ForeignKeyField(Login)
+    SMS_number = pw.IntegerField()
+
 class Ownership(Entity):
     user_id = pw.ForeignKeyField(Login)
     xml_id = pw.TextField(unique=True)
+    sender = pw.TextField()
+    time = pw.DateField()
+    price = pw.IntegerField()
+
+class Blacklist(Entity):
+    user_id = pw.ForeignKeyField(Login)
+    ignore = pw.TextField()

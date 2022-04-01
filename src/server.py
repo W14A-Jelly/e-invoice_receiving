@@ -7,9 +7,10 @@ from src.error import InputError, AccessError
 from src import config
 from src.clear import clear
 from src.user import user_register, user_login, user_logout, user_update_email, user_update_password
-from src.email import email_set, email_retrieve_start, email_retrieve_end
+from src.myemail import email_set, email_retrieve_start, email_retrieve_end
 from src.database import Database
 from src.error import InputError, AccessError
+
 
 def quit_gracefully(*args):
     '''For coverage'''
@@ -45,9 +46,12 @@ def echo():
         'data': data
     })
 '''
+
+
 @APP.route("/", methods=['GET'])
 def defaultpath():
     return ('API document available at https://app.swaggerhub.com/apis/Jelly6/E-invoice-receiving-api/1.0.0#/')
+
 
 @APP.route("/user/register", methods=['POST'])
 def register_new_user():

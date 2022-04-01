@@ -1,32 +1,43 @@
-# Sprint 2 #
+# Sprint 3 #
 
-## Black box HTTP Tests: 7/3/22 -> 9/3/22 ##
+# e-invoice_visualiser #
+Frontend of application
 
-Zijie: user register, user logout , user login
+## Priority of features for Application ##
 
-Colby: email_retrieve_start , email_retrieve_end
+1. - [ ] Visualize stored e-invoices (Call /invoice/rendering/upload Build, Collaborate & Integrate APIs | SwaggerHub )
 
-Kian: update email, update password
+2. - [ ] Filter e-invoices (Default: Newest e-invoice, Filter by: time, sender, cost range)  Colby create use case
 
-Elise: set receive email, clear
+3. - [ ] File management system (Create directories) [Expand on this in sprint 4] Zijie create use case
 
-## Implementation: 7/3/22 -> 11/3/22 ##
+4. - [ ] Mark unread e-invoice (Add a visual marker) Elise create use case
 
-Zijie: retriever, end retrieve, validation
+5. - [ ] Accounts (Same account system as e-invoice receiving API)
 
-Colby: update email, update password
+6. - [ ] Blacklist sender (Not necessary right now)
 
-kian: output report, set receive email, clear
+## Features for e-invoice receiving API ##
+* - [ ] SMS (or use another groups)
 
-Elise: user register, user logout , user login
+* - [ ] Send error communication report to sender if e-invoice is not in UBL 2.1 standard.
 
+* - [ ] Notify user if there are storage problems
 
-## Extra Roles ##
+* - [ ] /list/filenames/ Route that returns all file names that belongs to the user.  {'filenames' : [filename, filename2]} using ownership table
 
-Colby: repository structure and jira backlog, database
+* - [ ] /list/filter/ Route that returns a list of filenames that meet filter criteria {'filenames' : ['filename1', 'filename2']} using ownership table
 
-Zijie: CI integration on github, settings in pylint & coverage
+* - [ ] Database has to store directory structure for each user id (Create this in sprint 4)
 
-Kian: Communciation, security and performance confluence page
+* - [ ] Database stores information about email, SMS number
 
-Elise: Assumptions confluence page, server
+## Roles ##
+
+* Colby: Frontend basic UI design, Database, Notify user if there are storage problems, ownership table new ‘sender’, ‘time’, ‘price'. Create SMS table ‘user_id’, ‘SMS number’. Create ‘blacklist’ table, ‘user_id’, 'ignore’
+
+* Elise: Mark unread e-invoice, /list/filenames/, Blacklist sender
+
+* Zijie: Filter e-invoices, File management system, Store information of sender to database
+
+* Kian: Accounts, SMS, Send error communication report, /list/filter/
