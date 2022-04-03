@@ -111,18 +111,6 @@ def list_invoices():
     return dumps(file_names)
 
 
-'''
-@APP.route("/invoice/upload", methods=['GET'])
-def upload_xml():
-    # TODO
-    token = request.args.get('token')
-    XML_body = request.args.get('XML_body')
-    report = function_name4(token, XML_body)
-
-    return dumps({"invoice_report": report})
-'''
-
-
 @APP.route("/user/update/email", methods=['PUT'])
 def update_email():
     input = request.get_json()
@@ -149,6 +137,17 @@ def data_clear():
         raise AccessError('Not authorised')
         return {}
 
+
+'''
+@APP.route("/invoice/upload", methods=['GET'])
+def upload_xml():
+    # TODO
+    token = request.args.get('token')
+    XML_body = request.args.get('XML_body')
+    report = function_name4(token, XML_body)
+
+    return dumps({"invoice_report": report})
+'''
 
 if __name__ == "__main__":
     Database.start()
