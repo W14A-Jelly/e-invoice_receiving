@@ -220,6 +220,7 @@ def retrival2(email_address, password, timestamp, user_id):
                             data = {
                                 'user_id': user_id, 'xml_id': attachment['filename'], 'sender': info['sender'], 'time': info['time'], 'price': info['price']}
                             Database.insert('Ownership', data)
+                            render_invoice("{user_id}_{attachment['filename']}")
 
         is_retrieve = Database.get_id('Email', user_id)[0].is_retrieve
 
