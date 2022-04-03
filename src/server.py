@@ -10,6 +10,7 @@ from src.user import user_register, user_login, user_logout, user_update_email, 
 from src.myemail import email_set, email_retrieve_start, email_retrieve_end
 from src.database import Database
 from src.list import list_filter, list_filenames
+from src.render import render_invoice
 from src.error import InputError, AccessError
 
 
@@ -109,6 +110,14 @@ def list_invoices():
     input = request.get_json()
     file_names = list_filenames(input['token'])
     return dumps(file_names)
+
+
+@APP.route("/render/invoice", methods=['GET'])
+def show_invoice():
+    input = request.get_json()
+    img_file_name = render_invoice(input['filename'])
+
+    return dumps({'img': img_file_name})
 
 
 @APP.route("/user/update/email", methods=['PUT'])
