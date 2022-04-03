@@ -1,5 +1,5 @@
 import pytest
-import src.report as report
+from src import report
 
 
 @pytest.fixture
@@ -44,8 +44,7 @@ def test_update_successful(clear):
     Test return type of update_succesful
     '''
     report_name = report.create_new(200)
-    result = report.update_successful(report_name)
-    assert result is None
+    report.update_successful(report_name)
 
 
 def test_update_unsuccessful(clear):
@@ -53,8 +52,7 @@ def test_update_unsuccessful(clear):
     Test return type of update_unsuccesful
     '''
     report_name = report.create_new(200)
-    result = report.update_unsuccessful(report_name, "unknown error")
-    assert result is None
+    report.update_unsuccessful(report_name, "unknown error")
 
 
 def test_return_reports(clear, report_1, report_2):
@@ -71,5 +69,4 @@ def test_clear_reports():
     '''
     Test return type of clear_reports
     '''
-    result = report.clear_reports()
-    assert result is None
+    report.clear_reports()
