@@ -17,6 +17,14 @@ def list_filter(user_token, sender, time, price):
     user_id = decode_token(user_token)['user_id']
     unfiltered_list = Database.get_id('Ownership', user_id)
 
+    # handle cases where textboxes are empty on frontend
+    if sender == "\"\"" or sender == '\'\'':
+        sender = ""
+    if time == "\"\"" or time == '\'\'':
+        time = ""
+    if price == "\"\"" or price == '\'\'':
+        price = ""
+
     filtered_list = filter(lambda item: price_filter(str(item.price), price),
                            filter(lambda item: time_filter(item.time.strftime('%Y-%m-%d'), time),
                                   filter(lambda item: sender_filter(item.sender, sender), unfiltered_list)))
