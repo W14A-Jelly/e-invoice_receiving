@@ -19,9 +19,10 @@ jobs:
           pip install coverage
           pip install -r requirements.txt
 
-      - name: Analysing the code with pylint
+      - name: Coverage
         run: |
           coverage run -m src.server
+          kill -SIGINT %1
           pytest 
           coverage report
           coverage html
