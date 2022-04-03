@@ -23,7 +23,7 @@ def render_invoice(invoice_filename):
     extracted = zipped_file.namelist()
     zipped_file.extractall("src/static/renders")
     render_filename = extracted[0]
-    os.rename(f'src/static/renders/{render_filename}','src/static/renders/{invoice_filename}.jpg)
+    os.rename(f'src/static/renders/{render_filename}','src/static/renders/{invoice_filename}.jpg')
     
     return render_filename
 
