@@ -99,23 +99,26 @@ def end_api():
 
 @APP.route("/list/filenames/filtered", methods=['GET'])
 def filter_invoices():
-    input = request.get_json()
+    token = request.args.get('token')
+    sender = request.args.get('sender')
+    time = request.args.get('time')
+    price = request.args.get('price')
     filtered_list = list_filter(
-        input['token'], input['sender'], input['time'], input['price'])
+        token, sender, sender, price)
     return dumps(filtered_list)
 
 
 @APP.route("/list/filenames", methods=['GET'])
 def list_invoices():
-    input = request.get_json()
-    file_names = list_filenames(input['token'])
+    token = request.args.get('token')
+    file_names = list_filenames(token)
     return dumps(file_names)
 
 
 @APP.route("/render/invoice", methods=['GET'])
 def show_invoice():
-    input = request.get_json()
-    img_file_name = render_invoice(input['filename'])
+    fn = request.args.get('filename')
+    img_file_name = render_invoice(fn)
 
     return dumps({'img': img_file_name})
 
@@ -165,4 +168,4 @@ if __name__ == "__main__":
     Database.start()
     Database.create_tables()
     signal.signal(signal.SIGINT, quit_gracefully)  # For coverage
-    APP.run(port=config.port, debug=True)  # Do not edit this port\
+    APP.run(port=config.port)  # Do not edit this port\

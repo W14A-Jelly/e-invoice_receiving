@@ -10,6 +10,7 @@ def render_invoice(invoice_filename):
     base_url = "https://e-invoice-rendering-brownie.herokuapp.com/invoice/rendering"
 
     # Open invoice and make http post request
+    print(f"invoices/{invoice_filename}")
     file = {'file': open(f"invoices/{invoice_filename}", 'rb')}
     response = requests.post(url=f"{base_url}/upload", files=file)
     file_id = json.loads(response.text)['file_ids'][0]
@@ -23,7 +24,8 @@ def render_invoice(invoice_filename):
     extracted = zipped_file.namelist()
     zipped_file.extractall("src/static/renders")
     render_filename = extracted[0]
-
+    os.rename(f'src/static/renders/{render_filename}',f'src/static/renders/{invoice_filename}.jpg')
+    
     return render_filename
 
 
