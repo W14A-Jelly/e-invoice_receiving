@@ -9,6 +9,7 @@ from src.clear import clear
 from src.user import user_register, user_login, user_logout, user_update_email, user_update_password
 from src.myemail import email_set, email_retrieve_start, email_retrieve_end
 from src.database import Database
+from src.list import list_filter
 from src.error import InputError, AccessError
 
 
@@ -95,6 +96,14 @@ def end_api():
     return dumps(reports)
 
 
+@APP.route("/list/filter", methods=['GET'])
+def filter():
+    input = request.get_json()
+    filtered_list = list_filter(
+        input['token'], input['sender'], input['time'], input['price'])
+    return dumps(filtered_list)
+
+
 '''
 @APP.route("/invoice/upload", methods=['GET'])
 def upload_xml():
@@ -138,4 +147,4 @@ if __name__ == "__main__":
     Database.start()
     Database.create_tables()
     signal.signal(signal.SIGINT, quit_gracefully)  # For coverage
-    APP.run(port=config.port, debug=False)  # Do not edit this port\
+    APP.run(port=config.port, debug=True)  # Do not edit this port\

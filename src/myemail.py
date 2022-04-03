@@ -18,7 +18,6 @@ import pytz
 from bs4 import BeautifulSoup
 
 
-
 def email_set(token, email_address, email_pass):
     # validate email can be logged into
     #host = imaplib.IMAP4_SSL("imap.gmail.com")
@@ -218,7 +217,8 @@ def retrival2(email_address, password, timestamp, user_id):
                         else:
                             report.update_successful(rp_name)
                             info = xml_extract(fp)
-                            data = {'user_id' : user_id, 'xml_id' : attachment['filename'], 'sender': info['sender'], 'time': info['time'], 'price' : info['price']}
+                            data = {
+                                'user_id': user_id, 'xml_id': attachment['filename'], 'sender': info['sender'], 'time': info['time'], 'price': info['price']}
                             Database.insert('Ownership', data)
 
         is_retrieve = Database.get_id('Email', user_id)[0].is_retrieve
@@ -288,31 +288,28 @@ def email_retrieve_end(token):
 
         Database.update('Email', user_id, updated)
         reports = report.return_reports()
-        report.clear_reports()
     return {'reports': reports}
 
-def xml_extract(fp):
+
+def xml_extract(path_to_file):
     '''
     given a path. This file extract supplier, issued date and price from the given invoice file path
     '''
-    with open("Au_invoice.xml") as fp:
+    with open(path_to_file) as fp:
         soup = BeautifulSoup(fp, features='xml')
 
-    supplier = soup.find(name= 'cac:AccountingSupplierParty')
-    supplier= supplier.find(name= 'cac:Party')
-    supplier = supplier.find(name= 'cac:PartyName')
-    supplier = supplier.find(name= 'cbc:Name')
+    supplier = soup.find(name='cac:AccountingSupplierParty')
+    supplier = supplier.find(name='cac:Party')
+    supplier = supplier.find(name='cac:PartyName')
+    supplier = supplier.find(name='cbc:Name')
     supplier = str(supplier.contents[0])
 
-
-    time = soup.find(name= 'cbc:IssueDate')
+    time = soup.find(name='cbc:IssueDate')
     time = str(time.contents[0])
     datetime_object = datetime.strptime(time, '%Y-%m-%d').date()
 
-
-
-    price = soup.find(name= 'cac:LegalMonetaryTotal')
-    price = price.find(name = 'cbc:TaxInclusiveAmount')
+    price = soup.find(name='cac:LegalMonetaryTotal')
+    price = price.find(name='cbc:TaxInclusiveAmount')
     price = float(price.contents[0])
 
-    return ({'sender': supplier, 'time' : datetime_object, 'price' : price})
+    return ({'sender': supplier, 'time': datetime_object, 'price': price})
