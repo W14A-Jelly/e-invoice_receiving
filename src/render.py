@@ -3,6 +3,7 @@ import requests
 import json
 import zipfile
 import io
+import os
 
 
 def render_invoice(path_to_invoice):
@@ -19,8 +20,12 @@ def render_invoice(path_to_invoice):
 
     # Extract zipped response to renders directory
     zipped_file = zipfile.ZipFile(io.BytesIO(response.content))
+    extracted = zipped_file.namelist()
     zipped_file.extractall("renders")
+    path_to_render = os.path.join("renders", extracted[0])
+
+    return path_to_render
 
 
 if __name__ == "__main__":
-    render_invoice("invoices/example2.xml")
+    render_invoice("invoices\example1.xml")
