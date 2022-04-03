@@ -8,7 +8,7 @@ def list_filenames(user_token):
     file_names = []
     raw_list = Database.get_id('Ownership', user_id)
     for item in raw_list:
-        file_names.append(f"invoices/{user_id}_{item.xml_id}")
+        file_names.append(f"{user_id}_{item.xml_id}")
     return {'filenames': file_names}
 
 
@@ -23,7 +23,7 @@ def list_filter(user_token, sender, time, price):
 
     file_names = []
     for item in filtered_list:
-        file_names.append(f"invoices/{user_id}_{item.xml_id}")
+        file_names.append(f"{user_id}_{item.xml_id}")
     return {'filenames': file_names}
 
 
