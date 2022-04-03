@@ -86,8 +86,8 @@ def user_logout(token):
     user = Database.get_id('Login', token_data['user_id'])[0]
     session = user.session_id
     sessionList = session.split()
-
-    sessionList.remove(session)
+    
+    sessionList.remove(token_data['session_id'])
     new_session_id = ' '.join(sessionList)
 
     Database.update('Login', token_data['user_id'], {'session_id' : new_session_id})
