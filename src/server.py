@@ -9,7 +9,7 @@ from src.clear import clear
 from src.user import user_register, user_login, user_logout, user_update_email, user_update_password
 from src.myemail import email_set, email_retrieve_start, email_retrieve_end
 from src.database import Database
-from src.list import list_filter
+from src.list import list_filter, list_filenames
 from src.error import InputError, AccessError
 
 
@@ -96,12 +96,19 @@ def end_api():
     return dumps(reports)
 
 
-@APP.route("/list/filter", methods=['GET'])
-def filter():
+@APP.route("/list/filenames/filtered", methods=['GET'])
+def filter_invoices():
     input = request.get_json()
     filtered_list = list_filter(
         input['token'], input['sender'], input['time'], input['price'])
     return dumps(filtered_list)
+
+
+@APP.route("/list/filenames", methods=['GET'])
+def list_invoices():
+    input = request.get_json()
+    file_names = list_filenames(input['token'])
+    return dumps(file_names)
 
 
 '''
