@@ -220,7 +220,8 @@ def retrival2(email_address, password, timestamp, user_id):
                             data = {
                                 'user_id': user_id, 'xml_id': attachment['filename'], 'sender': info['sender'], 'time': info['time'], 'price': info['price']}
                             Database.insert('Ownership', data)
-                            render_invoice("{user_id}_{attachment['filename']}")
+                            render_invoice(
+                                "{user_id}_{attachment['filename']}")
 
         is_retrieve = Database.get_id('Email', user_id)[0].is_retrieve
 
@@ -234,12 +235,11 @@ def email_validate_xml(path_to_invoice):
 
     # Validate well-formedness, if invalid remove xml from invoices
     try:
-        etree.parse(path_to_invoice)
+        invoice_root = etree.parse(path_to_invoice)
 
     except etree.XMLSyntaxError:
         return False
 
-    '''
     # Validate against schema, if invalid remove xml from invoices
     schema_root = etree.parse('src/xmlschema.xsl')
     xmlschema = etree.XMLSchema(schema_root)
@@ -249,7 +249,7 @@ def email_validate_xml(path_to_invoice):
     except etree.DocumentInvalid:
         os.remove(path_to_invoice)
         return False
-    '''
+
     return True
 
 
@@ -314,3 +314,7 @@ def xml_extract(path_to_file):
     price = float(price.contents[0])
 
     return ({'sender': supplier, 'time': datetime_object, 'price': price})
+
+
+if __name__ == "__main__":
+    email_validate_xml("invoices/example1.xml")
