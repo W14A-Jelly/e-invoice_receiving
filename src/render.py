@@ -21,7 +21,7 @@ def render_invoice(invoice_filename):
     # Extract zipped response to renders directory
     zipped_file = zipfile.ZipFile(io.BytesIO(response.content))
     extracted = zipped_file.namelist()
-    zipped_file.extractall("renders")
+    zipped_file.extractall("src/static/renders")
     render_filename = extracted[0]
 
     return render_filename
