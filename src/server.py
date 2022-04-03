@@ -31,7 +31,7 @@ def defaultHandler(err):
     return response
 
 
-APP = Flask(__name__)
+APP = Flask(__name__, static_url_path= '/static')
 CORS(APP)
 
 APP.config['TRAP_HTTP_EXCEPTIONS'] = True
@@ -157,6 +157,9 @@ def upload_xml():
 
     return dumps({"invoice_report": report})
 '''
+@APP.route('/static/<path:path>')
+def send_js(path):
+    return send_from_directory('',path)
 
 if __name__ == "__main__":
     Database.start()
