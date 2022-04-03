@@ -10,6 +10,7 @@ from src.user import user_register, user_login, user_logout, user_update_email, 
 from src.myemail import email_set, email_retrieve_start, email_retrieve_end
 from src.database import Database
 from src.list import list_filter, list_filenames
+from src.render import render_invoice
 from src.error import InputError, AccessError
 
 
@@ -111,16 +112,12 @@ def list_invoices():
     return dumps(file_names)
 
 
-'''
-@APP.route("/invoice/upload", methods=['GET'])
-def upload_xml():
-    # TODO
-    token = request.args.get('token')
-    XML_body = request.args.get('XML_body')
-    report = function_name4(token, XML_body)
+@APP.route("/render/invoice", methods=['GET'])
+def show_invoice():
+    input = request.get_json()
+    img_file_name = render_invoice(input['filename'])
 
-    return dumps({"invoice_report": report})
-'''
+    return dumps({'img': img_file_name})
 
 
 @APP.route("/user/update/email", methods=['PUT'])
@@ -149,6 +146,17 @@ def data_clear():
         raise AccessError('Not authorised')
         return {}
 
+
+'''
+@APP.route("/invoice/upload", methods=['GET'])
+def upload_xml():
+    # TODO
+    token = request.args.get('token')
+    XML_body = request.args.get('XML_body')
+    report = function_name4(token, XML_body)
+
+    return dumps({"invoice_report": report})
+'''
 
 if __name__ == "__main__":
     Database.start()
