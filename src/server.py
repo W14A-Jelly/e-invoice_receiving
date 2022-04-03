@@ -104,7 +104,7 @@ def filter_invoices():
     time = request.args.get('time')
     price = request.args.get('price')
     filtered_list = list_filter(
-        token, sender, sender, price)
+        token, sender, time, price)
     return dumps(filtered_list)
 
 
@@ -168,4 +168,4 @@ if __name__ == "__main__":
     Database.start()
     Database.create_tables()
     signal.signal(signal.SIGINT, quit_gracefully)  # For coverage
-    APP.run(port=config.port)  # Do not edit this port\
+    APP.run(host = '0.0.0.0', port=config.port)  # Do not edit this port\

@@ -58,18 +58,21 @@ def user_login(email_address, password):
                 userID = user.user_id
                 Database.update('Login', userID, {'email' : email})
                 break
-
+    session_tail = ''            
     if session == '':
         session += '0'
+        session_tail = '0'
     else: 
-        session += ' ' + str(int(session.split()[-1]) + 1)
+        
+        session_tail = str(int(session.split()[-1]) + 1)
+        session += ' ' + session_tail
 
     if validate == 0:
         raise InputError(description='Email not in the list or password is incorrect')
 
     Database.update('Login', userID, {'session_id' : session})
 
-    newToken = jwt.encode({'user_id': userID, 'session_id': session}, SECRET_KEY, algorithm='HS256')
+    newToken = jwt.encode({'user_id': userID, 'session_id': session_tail}, SECRET_KEY, algorithm='HS256')
     return {'token' : newToken}
 
 def user_logout(token):
