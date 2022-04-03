@@ -62,7 +62,7 @@ def user_login(email_address, password):
     if session == '':
         session += '0'
     else: 
-        session = ' ' + str(int(session.split()[-1]) + 1)
+        session += ' ' + str(int(session.split()[-1]) + 1)
 
     if validate == 0:
         raise InputError(description='Email not in the list or password is incorrect')
