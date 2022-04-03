@@ -6,11 +6,11 @@ import io
 import os
 
 
-def render_invoice(path_to_invoice):
+def render_invoice(invoice_filename):
     base_url = "https://e-invoice-rendering-brownie.herokuapp.com/invoice/rendering"
 
     # Open invoice and make http post request
-    file = {'file': open(path_to_invoice, 'rb')}
+    file = {'file': open(f"invoices/{invoice_filename}", 'rb')}
     response = requests.post(url=f"{base_url}/upload", files=file)
     file_id = json.loads(response.text)['file_ids'][0]
 
@@ -21,11 +21,11 @@ def render_invoice(path_to_invoice):
     # Extract zipped response to renders directory
     zipped_file = zipfile.ZipFile(io.BytesIO(response.content))
     extracted = zipped_file.namelist()
-    zipped_file.extractall("renders")
-    path_to_render = os.path.join("renders", extracted[0])
+    zipped_file.extractall("src/static/renders")
+    render_filename = extracted[0]
 
-    return path_to_render
+    return render_filename
 
 
 if __name__ == "__main__":
-    render_invoice("invoices\example1.xml")
+    print(render_invoice("example1.xml"))
