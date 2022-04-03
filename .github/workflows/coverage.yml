@@ -23,7 +23,6 @@ jobs:
         run: |
           coverage run -m src.server >& $SERVER_LOG &
           pylint tests/
-          kill -SIGINT %1
           cat $SERVER_LOG
           coverage report
           coverage html
