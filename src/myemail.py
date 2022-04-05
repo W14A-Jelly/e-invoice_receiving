@@ -187,6 +187,7 @@ def retrival2(email_address, password, timestamp, user_id):
             message_time = mktime_tz(parsedate_tz(message.date))
             if timestamp > message_time:
                 break
+            email = message.sent_from[0]['email']
             for attachment in message.attachments:
                 if 'xml' in attachment['content-type']:
                     file_name = attachment['filename']
@@ -205,7 +206,7 @@ def retrival2(email_address, password, timestamp, user_id):
                         param = f'%s Failed to save', attachment['filename']
                         report.update_unsuccessful(rp_name, param)
                         report.email_error_report(
-                            fp, rp_name, "se2y22g32@gmail.com", email_address)
+                            fp, rp_name, email, email_address)
 
                     if d_successful == True:
                         valid = email_validate_xml(fp)
@@ -213,7 +214,7 @@ def retrival2(email_address, password, timestamp, user_id):
                             param = f'%s Not UBL standard', attachment['filename']
                             report.update_unsuccessful(rp_name, param)
                             report.email_error_report(
-                                fp, rp_name, "se2y22g32@gmail.com", email_address)
+                                fp, rp_name, email, email_address)
                             os.remove(fp)
                         else:
                             report.update_successful(rp_name)

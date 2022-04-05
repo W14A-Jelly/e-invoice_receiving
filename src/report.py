@@ -81,7 +81,7 @@ def clear_reports():
 def email_error_report(path_to_XML, path_to_report, receiver_email, client_email):
     # Login details of email to send from
     sender_email = "einvoice.retrieve@gmail.com"
-    password = 'tqgj frum fezi kizp'
+    password = 'hvxx qjly uoqj owgu'
 
     # Subject and body of email
     subject = "Error Sending XML Invoice To %s" % (client_email)
