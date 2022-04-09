@@ -39,6 +39,8 @@ class Ownership(Entity):
     sender = pw.TextField()
     time = pw.DateField()
     price = pw.IntegerField()
+    new = pw.BooleanField(defult=True)
+    paid = pw.BooleanField(defult=False)
 
 class Blacklist(Entity):
     user_id = pw.ForeignKeyField(Login)
