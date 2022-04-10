@@ -9,7 +9,7 @@ from src.clear import clear
 from src.user import user_register, user_login, user_logout, user_update_email, user_update_password
 from src.myemail import email_set, email_retrieve_start, email_retrieve_end
 from src.database import Database
-from src.list import list_filter, list_filenames
+from src.list import list_filter, list_filenames, get_stats
 from src.render import render_invoice
 from src.error import InputError, AccessError
 
@@ -149,7 +149,11 @@ def data_clear():
         raise AccessError('Not authorised')
         return {}
 
-
+@APP.route('/get/stats')
+def get_statistic():
+    token = request.args.get('token')
+    year = request.args.get('year')
+    return dumps(get_stats(token, year))
 '''
 @APP.route("/invoice/upload", methods=['GET'])
 def upload_xml():

@@ -1,5 +1,6 @@
 from src.helper import decode_token
 from src.database import Database
+from datetime import datetime
 
 
 def list_filenames(user_token):
@@ -51,3 +52,20 @@ def price_filter(element, price):
     if price == "" or element == price:
         return True
     return False
+
+
+def get_stats(token, year):
+    # return the expense of each month for corresponding year.
+    price = [0,0,0,0,0,0,0,0,0,0,0,0]
+    user_id = decode_token(user_token)['user_id']
+    data = Database.get_id('Ownership', user_id)
+    for tup in data:
+        time = tup.time
+        month = int(time.datetime.strftime("%m"))
+        invoice_year = time.datetime.strftime("%Y")
+        if invoice_year == year and month <=12 and month > 0:
+            price[month-1] += tup.price
+
+    return price
+
+
