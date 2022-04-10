@@ -76,7 +76,8 @@ def return_reports():
 def clear_reports():
     reports = glob.glob('reports/*')
     for report in reports:
-        os.remove(report)
+        if report != "README.txt":
+            os.remove(report)
 
 
 def email_error_report(path_to_XML, path_to_report, receiver_email, client_email):
