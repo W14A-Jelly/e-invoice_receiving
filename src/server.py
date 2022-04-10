@@ -12,7 +12,7 @@ from src.database import Database
 from src.list import list_filter, list_filenames, get_stats
 from src.render import render_invoice
 from src.error import InputError, AccessError
-
+from src.database import Database
 
 def quit_gracefully(*args):
     '''For coverage'''
@@ -166,6 +166,9 @@ def upload_xml():
 '''
 @APP.route('/static/<path:path>')
 def send_js(path):
+    removed_front = xml.partition('renders/')[2]
+    file_name = removed_front.partition('.jpg')[0]
+    Database.update_invoice(file_name, {'new':False})
     return send_from_directory('',path)
 
 if __name__ == "__main__":

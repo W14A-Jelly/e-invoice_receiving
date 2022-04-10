@@ -76,6 +76,15 @@ class Database:
         table = find_table(table)
         query = table.select().where(table.user_id == id).order_by(table.user_id)
         return [row for row in query]
+    
+    def get_invoice(id):
+        table = find_table("Ownership")
+        query = table.select().where(table.xml_id == id).order_by(table.xml_id)
+        return [row for row in query]
+    
+    def update_invoice(id,data):
+        table = find_table("Ownership")
+        table.update(data).where(table.xml_id== id).execute()
 
     def get_table(table):
         # Returns a list of all rows in a table
