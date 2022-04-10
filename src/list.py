@@ -7,6 +7,8 @@ def list_filenames(user_token):
     # returns list of invoice file names belonging to a user
     user_id = decode_token(user_token)['user_id']
     file_names = []
+    new = []
+    paid = []
     raw_list = Database.get_id('Ownership', user_id)
     for item in raw_list:
         file_names.append(f"{user_id}_{item.xml_id}")
@@ -66,6 +68,6 @@ def get_stats(token, year):
         if invoice_year == year and month <=12 and month > 0:
             price[month-1] += tup.price
 
-    return price
+    return {'price':price}
 
 
