@@ -7,10 +7,14 @@ def list_filenames(user_token):
     # returns list of invoice file names belonging to a user
     user_id = decode_token(user_token)['user_id']
     file_names = []
+    new = []
+    paid = []
     raw_list = Database.get_id('Ownership', user_id)
     for item in raw_list:
         file_names.append(f"{user_id}_{item.xml_id}")
-    return {'filenames': file_names}
+        new.append(item.new)
+        paid.append(item.paid)
+    return {'filenames': file_names, 'new':new, 'paid':paid}
 
 
 def list_filter(user_token, sender, time, price):
@@ -31,9 +35,13 @@ def list_filter(user_token, sender, time, price):
                                   filter(lambda item: sender_filter(item.sender, sender), unfiltered_list)))
 
     file_names = []
+    new = []
+    paid = []
     for item in filtered_list:
         file_names.append(f"{user_id}_{item.xml_id}")
-    return {'filenames': file_names}
+        new.append(item.new)
+        paid.append(item.paid)
+    return {'filenames': file_names, 'new':new, 'paid':paid}
 
 
 def sender_filter(element, sender):
