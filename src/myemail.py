@@ -21,7 +21,7 @@ from src.render import render_invoice
 
 def email_set(token, email_address, email_pass):
     # validate email can be logged into
-    #host = imaplib.IMAP4_SSL("imap.gmail.com")
+    # host = imaplib.IMAP4_SSL("imap.gmail.com")
 
     decode_data = decode_token(token)
     if decode_data == None:
@@ -32,7 +32,7 @@ def email_set(token, email_address, email_pass):
         mail = Imbox(host, username=email_address, password=email_pass,
                      ssl=True, ssl_context=None, starttls=False)
         mail.logout
-        #login_status, acc = mail.login(email_address, email_pass)
+        # login_status, acc = mail.login(email_address, email_pass)
     except:
         raise AccessError(
             'Could not update email, given credentials are invalid')
@@ -88,7 +88,7 @@ def email_retrieve_start(token):
 
 '''
 def help_check_inbox(email_address, password,timestamp,user_id ):
-    #DATABASE select is retrieve from email retrieve where email = email_address
+    # DATABASE select is retrieve from email retrieve where email = email_address
     is_retrieve = Database.get_id('Email', user_id)[0].is_retrieve
     mail = imaplib.IMAP4_SSL("imap.gmail.com")
     login_status, acc = mail.login(email_address, password)
@@ -98,10 +98,10 @@ def help_check_inbox(email_address, password,timestamp,user_id ):
         inbox_status, data = mail.select('Inbox')
         if inbox_status != 'OK':
             raise AccessError("Cannot search inbox")
-        #loop through inboxes
+        # loop through inboxes
         for count,mid in enumerate(data[0].split())
             message_status, msg_info = mail.fetch(mid, '(RFC822)')
-            #m = email.message_from_string(msg_info[0][1])
+            # m = email.message_from_string(msg_info[0][1])
             m = email.message_from_string(msg_info[0][1])
             # Not sure if the keyword need to be Date or Time, need to makeup a gmail for further test
             if n == 0:
@@ -134,7 +134,8 @@ def help_check_inbox(email_address, password,timestamp,user_id ):
 
                 if bool(file_name):
                     # make sure invoice directory is created when the server is running.
-                    fp = os.path.join(os.getcwd(),'invoices', str(user_id),file_name)
+                    fp = os.path.join(os.getcwd(),'invoices',
+                                      str(user_id),file_name)
                     if not os.path.isfile(fp):
                         # attatchment type checking
                         if 'xml' in part.get_payload()[1].get_content_type():
@@ -147,11 +148,13 @@ def help_check_inbox(email_address, password,timestamp,user_id ):
                                     report.update_successful(rp_name)
                                     Database.insert('Ownership', {user_id: user_id, xml_id = file_name})
                                 except:
-                                    report.update_unsuccessful(rp_name,'cannot save invoice')
+                                    report.update_unsuccessful(
+                                        rp_name,'cannot save invoice')
                             else:
-                                report.update_unsuccessful(rp_name, 'Not UBL standard')
+                                report.update_unsuccessful(
+                                    rp_name, 'Not UBL standard')
 
-        #sleep(30)                       
+        # sleep(30)
         is_retrieve = Database.get_id('Email', user_id)[0].is_retrieve
 
     mail.close()
@@ -203,7 +206,7 @@ def retrival2(email_address, password, timestamp, user_id):
 
                         d_successful = True
                     except:
-                        param = f'%s Failed to save', attachment['filename']
+                        param = "%s Failed to save" % (attachment['filename'])
                         report.update_unsuccessful(rp_name, param)
                         report.email_error_report(
                             fp, rp_name, email, email_address)
@@ -211,7 +214,8 @@ def retrival2(email_address, password, timestamp, user_id):
                     if d_successful == True:
                         valid = email_validate_xml(fp)
                         if valid == False:
-                            param = f'%s Not UBL standard', attachment['filename']
+                            param = "%s Not UBL standard" % (
+                                attachment['filename'])
                             report.update_unsuccessful(rp_name, param)
                             report.email_error_report(
                                 fp, rp_name, email, email_address)
