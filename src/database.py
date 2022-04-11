@@ -77,15 +77,15 @@ class Database:
         table = find_table(table)
         query = table.select().where(table.user_id == id).order_by(table.user_id)
         return [row for row in query]
-    
+
     def get_invoice(id):
         table = find_table("Ownership")
         query = table.select().where(table.xml_id == id).order_by(table.xml_id)
         return [row for row in query]
-    
-    def update_invoice(id,data):
+
+    def update_invoice(id, data):
         table = find_table("Ownership")
-        table.update(data).where(table.xml_id== id).execute()
+        table.update(data).where(table.xml_id == id).execute()
 
     def get_table(table):
         # Returns a list of all rows in a table
@@ -114,6 +114,7 @@ class Database:
                     print(f'email: {record.email}')
                     print(f'password: {record.password}')
                     print(f'session_id: {record.session_id}')
+                    print(f'spam_filter_on: {record.spam_filter_on}')
                     print(symb * (num_symb + len(name) + 2))
             case 'SMS':
                 for record in table.select().order_by(table.user_id):
@@ -152,13 +153,6 @@ if __name__ == "__main__":
     # Debug Database
     # Database.start()
     # Database.create_tables()
-    '''
-    login_data = {'password' : 'password',
-                            'email' : 'exmaple2@gmail.com', 
-                            'session_id' : '0 1',
-                            'user_id' : 1}
-    '''
-    #Database.insert('Login', login_data)
     #Database.insert('Ownership', {'user_id':0, 'xml_id':123})
     #Database.insert('Ownership', {'user_id':0, 'xml_id':124})
     #data = {'password' :'newpassword', 'email' : 'new2@gmail.com'}
@@ -168,3 +162,4 @@ if __name__ == "__main__":
     # print(Database.get_table('Login')[1].user_id)
     # Database.print_table('Login')
     # Database.stop()
+    pass
