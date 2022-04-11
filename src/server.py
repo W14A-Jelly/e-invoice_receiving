@@ -12,12 +12,9 @@ from src.database import Database
 from src.list import list_filter, list_filenames, get_stats
 from src.render import render_invoice
 from src.error import InputError, AccessError
-<<<<<<< HEAD
 from src.database import Database
-=======
 from src.blacklist import blacklist_add, blacklist_remove, blacklist_list
 
->>>>>>> SE2Y22G32-176-blacklist-block-user
 
 def quit_gracefully(*args):
     '''For coverage'''
@@ -196,24 +193,15 @@ def upload_xml():
 
 @APP.route('/static/<path:path>')
 def send_js(path):
-<<<<<<< HEAD
-    removed_front = xml.partition('renders/')[2]
+    removed_front = path.partition('renders/')[2]
     file_name = removed_front.partition('.jpg')[0]
     Database.update_invoice(file_name, {'new':False})
     return send_from_directory('',path)
-=======
-    return send_from_directory('', path)
-
->>>>>>> SE2Y22G32-176-blacklist-block-user
 
 
 if __name__ == "__main__":
     Database.start()
     Database.create_tables()
     signal.signal(signal.SIGINT, quit_gracefully)  # For coverage
-<<<<<<< HEAD
     APP.run(host='0.0.0.0', port=config.port,
             debug=True)  # Do not edit this port\
-=======
-    APP.run(host='0.0.0.0', port=config.port)  # Do not edit this port\
->>>>>>> SE2Y22G32-176-blacklist-block-user
