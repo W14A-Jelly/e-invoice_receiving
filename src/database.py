@@ -44,6 +44,7 @@ def find_table(table):
         case 'Blacklist':
             return Blacklist
 
+
 class Database:
     def start():
         # Connect to SQLite server. Error if server is already connected.

@@ -12,6 +12,7 @@ from src.database import Database
 from src.list import list_filter, list_filenames
 from src.render import render_invoice
 from src.error import InputError, AccessError
+from src.blacklist import blacklist_add, blacklist_remove, blacklist_list
 
 
 def quit_gracefully(*args):
@@ -31,7 +32,7 @@ def defaultHandler(err):
     return response
 
 
-APP = Flask(__name__, static_url_path= '/static')
+APP = Flask(__name__, static_url_path='/static')
 CORS(APP)
 
 APP.config['TRAP_HTTP_EXCEPTIONS'] = True
@@ -123,6 +124,27 @@ def show_invoice():
     return dumps({'img': img_file_name})
 
 
+@APP.route("/blacklist/block", methods=['PUT'])
+def block():
+    input = request.get_json
+    blacklist_add(input['token'], input['email'])
+    return ({})
+
+
+@APP.route("/blacklist/unblock", methods=['PUT'])
+def unblock():
+    input = request.get_json
+    blacklist_remove(input['token'], input['email'])
+    return ({})
+
+
+@APP.route("/blacklist/list", methods=['GET'])
+def unblock():
+    token = request.args.get('token')
+    blacklist = blacklist_list(token)
+    return ({'blacklist': blacklist})
+
+
 @APP.route("/user/update/email", methods=['PUT'])
 def update_email():
     input = request.get_json()
@@ -160,12 +182,15 @@ def upload_xml():
 
     return dumps({"invoice_report": report})
 '''
+
+
 @APP.route('/static/<path:path>')
 def send_js(path):
-    return send_from_directory('',path)
+    return send_from_directory('', path)
+
 
 if __name__ == "__main__":
     Database.start()
     Database.create_tables()
     signal.signal(signal.SIGINT, quit_gracefully)  # For coverage
-    APP.run(host = '0.0.0.0', port=config.port)  # Do not edit this port\
+    APP.run(host='0.0.0.0', port=config.port)  # Do not edit this port\
