@@ -52,3 +52,10 @@ class Ownership(Entity):
 class Blacklist(Entity):
     user_id = pw.ForeignKeyField(Login)
     ignore = pw.TextField()
+
+
+class Senders(Entity):
+    user_id = pw.ForeignKeyField(Login)
+    sender_email = pw.TextField()
+    invalid_counter = pw.IntegerField(default=0)
+    duplicate_counter = pw.IntegerField(default=0)

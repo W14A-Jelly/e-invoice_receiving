@@ -1,4 +1,4 @@
-from src.schema import db, Login, Email, SMS, Ownership, Blacklist
+from src.schema import Senders, db, Login, Email, SMS, Ownership, Blacklist, Senders
 
 '''
 Database class to manipulate table data and connect to SQLite server
@@ -43,6 +43,8 @@ def find_table(table):
             return Ownership
         case 'Blacklist':
             return Blacklist
+        case 'Senders':
+            return Senders
 
 
 class Database:
@@ -56,7 +58,8 @@ class Database:
 
     def create_tables():
         # Create new tables defined in schema.py if tables not exist.
-        db.create_tables([Login, Email, SMS, Ownership, Blacklist], safe=True)
+        db.create_tables([Login, Email, SMS, Ownership,
+                         Blacklist, Senders], safe=True)
 
     def drop_tables():
         # Delete all existing tables if tables exist.
@@ -152,7 +155,7 @@ class Database:
 if __name__ == "__main__":
     # Debug Database
     # Database.start()
-    # Database.create_tables()
+    Database.create_tables()
     #Database.insert('Ownership', {'user_id':0, 'xml_id':123})
     #Database.insert('Ownership', {'user_id':0, 'xml_id':124})
     #data = {'password' :'newpassword', 'email' : 'new2@gmail.com'}

@@ -1,6 +1,6 @@
 from src.helper import decode_token
 from src.database import Database
-from src.schema import Blacklist, Login
+from src.schema import Blacklist, Login, Senders
 from src.error import InputError
 
 
@@ -51,6 +51,24 @@ def spam_filter_off(token):
     user_row = Login.get(Login.user_id == user_id)
     user_row.spam_filter_on = False
     user_row.save()
+
+
+def is_blacklisted(user_id, email):
+    # returns True if email is blacklisted by user, false if not
+    blacklist_table_rows = Database.get_id('Blacklist', user_id)
+    for row in blacklist_table_rows:
+        if row.ignore == email:
+            return True
+    return False
+
+
+def reset_spam_counters(user_id, email):
+    # Reset duplicate/invalid counters to 0 in senders table
+    sender_row = Senders.get(Senders.user_id == user_id,
+                             Senders.sender_email == email)
+    sender_row.invalid_counter = 0
+    sender_row.duplicate_counter = 0
+    sender_row.save()
 
 
 if __name__ == "__main__":
