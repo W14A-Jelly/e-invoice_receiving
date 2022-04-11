@@ -142,21 +142,21 @@ def unblock():
 
 
 @APP.route("/blacklist/list", methods=['GET'])
-def unblock():
+def list_blacklist():
     token = request.args.get('token')
     blacklist = blacklist_list(token)
     return ({'blacklist': blacklist})
 
 
 @APP.route("/blacklist/spamfilter/on", methods=['PUT'])
-def unblock():
+def filter_on():
     input = request.get_json
     spam_filter_on(input['token'])
     return ({})
 
 
 @APP.route("/blacklist/spamfilter/off", methods=['PUT'])
-def unblock():
+def filter_off():
     input = request.args.get('token')
     spam_filter_off(input['token'])
     return ({})

@@ -1,6 +1,6 @@
 from src.helper import decode_token
 from src.database import Database
-from src.schema import Blacklist
+from src.schema import Blacklist, Login
 from src.error import InputError
 
 
@@ -40,15 +40,23 @@ def blacklist_list(token):
 def spam_filter_on(token):
     # Turns the spam filter on
     user_id = decode_token(token)['user_id']
+    user_row = Login.get(Login.user_id == user_id)
+    user_row.spam_filter_on = True
+    user_row.save()
 
 
 def spam_filter_off(token):
     # Turns the spam filter off
     user_id = decode_token(token)['user_id']
+    user_row = Login.get(Login.user_id == user_id)
+    user_row.spam_filter_on = False
+    user_row.save()
 
 
 if __name__ == "__main__":
     # blacklist_add('eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjowLCJzZXNzaW9uX2lkIjoiMCJ9.AF1mShROSkSXmVJ_4G7HrewpnQJvokH2DHMzn1HdhzE', 'aaaaa@gmail.com')
     # blacklist_remove('eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjowLCJzZXNzaW9uX2lkIjoiMCJ9.AF1mShROSkSXmVJ_4G7HrewpnQJvokH2DHMzn1HdhzE', 'test@gmail.com')
     # print(blacklist_list('eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjowLCJzZXNzaW9uX2lkIjoiMCJ9.AF1mShROSkSXmVJ_4G7HrewpnQJvokH2DHMzn1HdhzE'))
+    # spam_filter_on('eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjowLCJzZXNzaW9uX2lkIjoiMCJ9.AF1mShROSkSXmVJ_4G7HrewpnQJvokH2DHMzn1HdhzE')
+    # spam_filter_off('eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjowLCJzZXNzaW9uX2lkIjoiMCJ9.AF1mShROSkSXmVJ_4G7HrewpnQJvokH2DHMzn1HdhzE')
     pass
