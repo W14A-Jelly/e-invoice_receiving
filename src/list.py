@@ -122,7 +122,7 @@ def get_stats(token, year):
         if invoice_year == year and month <=12 and month > 0:
             price[month-1] += tup.price
 
-    return price
+    return {'price':price}
 
 if __name__ == "__main__":
     # print(price_filter("1.0", "0.5", "0.7"))
