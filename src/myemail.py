@@ -9,7 +9,7 @@ from datetime import datetime, timedelta, timezone
 from imbox import Imbox
 from src import report
 from src.database import Database
-from src.helper import decode_token
+from src.helper import decode_token, validate_xml, is_duplicate
 from lxml import etree
 from email.utils import parsedate_tz, mktime_tz
 import os
@@ -140,7 +140,7 @@ def help_check_inbox(email_address, password,timestamp,user_id ):
                         # attatchment type checking
                         if 'xml' in part.get_payload()[1].get_content_type():
                             rp_name =create_new(file_name)
-                            if email_validate_xml(part.get_payload(decode = True)):
+                            if validate_xml(part.get_payload(decode = True)):
                                 try:
                                     fp = open(fp, 'wb')
                                     fp.write(part.get_payload(decode = True))
@@ -190,7 +190,9 @@ def retrival2(email_address, password, timestamp, user_id):
             message_time = mktime_tz(parsedate_tz(message.date))
             if timestamp > message_time:
                 break
+            # sender's email
             email = message.sent_from[0]['email']
+
             for attachment in message.attachments:
                 if 'xml' in attachment['content-type']:
                     file_name = attachment['filename']
@@ -212,7 +214,7 @@ def retrival2(email_address, password, timestamp, user_id):
                             fp, rp_name, email, email_address)
 
                     if d_successful == True:
-                        valid = email_validate_xml(fp)
+                        valid = validate_xml(fp)
                         if valid == False:
                             param = "%s Not UBL standard" % (
                                 attachment['filename'])
@@ -235,36 +237,6 @@ def retrival2(email_address, password, timestamp, user_id):
 '''
                     else:
                         report.update_unsuccessful(rp_name, f'%s Not UBL standard', attachment['filename'])'''
-
-
-def email_validate_xml(path_to_invoice):
-
-    # Validate well-formedness
-    try:
-        invoice_root = etree.parse(path_to_invoice)
-
-    except etree.XMLSyntaxError:
-        return False
-
-    # Validate against schema
-    schema_root = etree.parse('xsd/UBL-Invoice-2.1.xsd')
-    xmlschema = etree.XMLSchema(schema_root)
-    try:
-        xmlschema.assertValid(invoice_root)
-
-    except etree.DocumentInvalid:
-        return False
-
-    # If no exceptions raised, xml is valid
-    return True
-
-
-def email_output_report():
-    # module to email_retrieve_start
-    '''
-    some description
-    '''
-    return {}
 
 
 def email_retrieve_end(token):
@@ -323,4 +295,4 @@ def xml_extract(path_to_file):
 
 
 if __name__ == "__main__":
-    print(email_validate_xml("invoices/example1.xml"))
+    print(validate_xml("invoices/example1.xml"))
