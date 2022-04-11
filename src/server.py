@@ -13,7 +13,7 @@ from src.list import list_filter, list_filenames, get_stats
 from src.render import render_invoice
 from src.error import InputError, AccessError
 from src.database import Database
-from src.blacklist import blacklist_add, blacklist_remove, blacklist_list
+from src.blacklist import blacklist_add, blacklist_remove, blacklist_list, spam_filter_on, spam_filter_off
 
 
 def quit_gracefully(*args):
@@ -148,6 +148,20 @@ def unblock():
     return ({'blacklist': blacklist})
 
 
+@APP.route("/blacklist/spamfilter/on", methods=['PUT'])
+def unblock():
+    input = request.get_json
+    spam_filter_on(input['token'])
+    return ({})
+
+
+@APP.route("/blacklist/spamfilter/off", methods=['PUT'])
+def unblock():
+    input = request.args.get('token')
+    spam_filter_off(input['token'])
+    return ({})
+
+
 @APP.route("/user/update/email", methods=['PUT'])
 def update_email():
     input = request.get_json()
@@ -174,11 +188,14 @@ def data_clear():
         raise AccessError('Not authorised')
         return {}
 
+
 @APP.route('/get/stats')
 def get_statistic():
     token = request.args.get('token')
     year = request.args.get('year')
     return dumps(get_stats(token, year))
+
+
 '''
 @APP.route("/invoice/upload", methods=['GET'])
 def upload_xml():
@@ -195,8 +212,8 @@ def upload_xml():
 def send_js(path):
     removed_front = path.partition('renders/')[2]
     file_name = removed_front.partition('.jpg')[0]
-    Database.update_invoice(file_name, {'new':False})
-    return send_from_directory('',path)
+    Database.update_invoice(file_name, {'new': False})
+    return send_from_directory('', path)
 
 
 if __name__ == "__main__":

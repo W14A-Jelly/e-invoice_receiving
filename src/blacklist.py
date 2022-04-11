@@ -37,6 +37,16 @@ def blacklist_list(token):
     return blacklist
 
 
+def spam_filter_on(token):
+    # Turns the spam filter on
+    user_id = decode_token(token)['user_id']
+
+
+def spam_filter_off(token):
+    # Turns the spam filter off
+    user_id = decode_token(token)['user_id']
+
+
 if __name__ == "__main__":
     # blacklist_add('eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjowLCJzZXNzaW9uX2lkIjoiMCJ9.AF1mShROSkSXmVJ_4G7HrewpnQJvokH2DHMzn1HdhzE', 'aaaaa@gmail.com')
     # blacklist_remove('eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjowLCJzZXNzaW9uX2lkIjoiMCJ9.AF1mShROSkSXmVJ_4G7HrewpnQJvokH2DHMzn1HdhzE', 'test@gmail.com')
