@@ -31,7 +31,7 @@ def defaultHandler(err):
     return response
 
 
-APP = Flask(__name__, static_url_path= '/static')
+APP = Flask(__name__, static_url_path='/static')
 CORS(APP)
 
 APP.config['TRAP_HTTP_EXCEPTIONS'] = True
@@ -101,10 +101,12 @@ def end_api():
 def filter_invoices():
     token = request.args.get('token')
     sender = request.args.get('sender')
-    time = request.args.get('time')
-    price = request.args.get('price')
+    min_time = request.args.get('min_time')
+    max_time = request.args.get('max_time')
+    min_price = request.args.get('min_price')
+    max_price = request.args.get('max_price')
     filtered_list = list_filter(
-        token, sender, time, price)
+        token, sender, min_time, max_time, min_price, max_price)
     return dumps(filtered_list)
 
 
@@ -160,12 +162,16 @@ def upload_xml():
 
     return dumps({"invoice_report": report})
 '''
+
+
 @APP.route('/static/<path:path>')
 def send_js(path):
-    return send_from_directory('',path)
+    return send_from_directory('', path)
+
 
 if __name__ == "__main__":
     Database.start()
     Database.create_tables()
     signal.signal(signal.SIGINT, quit_gracefully)  # For coverage
-    APP.run(host = '0.0.0.0', port=config.port)  # Do not edit this port\
+    APP.run(host='0.0.0.0', port=config.port,
+            debug=True)  # Do not edit this port\
