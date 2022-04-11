@@ -1,6 +1,8 @@
 from src.helper import decode_token
 from src.database import Database
-from datetime import datetime
+from datetime import datetime, date
+import sys
+
 
 
 def list_filenames(user_token):
@@ -17,7 +19,7 @@ def list_filenames(user_token):
     return {'filenames': file_names, 'new':new, 'paid':paid}
 
 
-def list_filter(user_token, sender, time, price):
+def list_filter(user_token, sender, min_time, max_time, min_price, max_price):
     # filter invoices by sender, time and price
     user_id = decode_token(user_token)['user_id']
     unfiltered_list = Database.get_id('Ownership', user_id)
@@ -25,13 +27,17 @@ def list_filter(user_token, sender, time, price):
     # handle cases where textboxes are empty on frontend
     if sender == "\"\"" or sender == '\'\'':
         sender = ""
-    if time == "\"\"" or time == '\'\'':
-        time = ""
-    if price == "\"\"" or price == '\'\'':
-        price = ""
+    if min_time == "\"\"" or min_time == '\'\'':
+        min_time = ""
+    if max_time == "\"\"" or max_time == '\'\'':
+        max_time = ""
+    if min_price == "\"\"" or min_price == '\'\'':
+        min_price = ""
+    if max_price == "\"\"" or max_price == '\'\'':
+        max_price = ""
 
-    filtered_list = filter(lambda item: price_filter(str(item.price), price),
-                           filter(lambda item: time_filter(item.time.strftime('%Y-%m-%d'), time),
+    filtered_list = filter(lambda item: price_filter(str(item.price), min_price, max_price),
+                           filter(lambda item: time_filter(item.time.strftime("%Y-%m-%d"), min_time, max_time),
                                   filter(lambda item: sender_filter(item.sender, sender), unfiltered_list)))
 
     file_names = []
@@ -50,17 +56,59 @@ def sender_filter(element, sender):
     return False
 
 
-def time_filter(element, time):
-    if time == "" or element == time:
+def time_filter(element, min_time, max_time):
+    # Case where user gives no min or max time
+    if (min_time == "" and max_time == ""):
         return True
+    # Case where no lower bound is given
+    elif (min_time == ""):
+        max_time = datetime.strptime(max_time, "%Y-%m-%d")
+        min_time = datetime.min
+    # Case where no upper bound is given
+    elif (max_time == ""):
+        min_time = datetime.strptime(min_time, "%Y-%m-%d")
+        max_time = datetime.max
+    # Convert both parameters to date time objets if both bounds given
+    else:
+        min_time = datetime.strptime(min_time, "%Y-%m-%d")
+        max_time = datetime.strptime(max_time, "%Y-%m-%d")
+
+    element = datetime.strptime(element, "%Y-%m-%d")
+
+    # Sees if datetime object lies between two times
+    if element >= min_time and element <= max_time:
+        return True
+
+    # Else
     return False
 
 
-def price_filter(element, price):
-    if price == "" or element == price:
+def price_filter(element, min_price, max_price):
+    # Case where user gives no min or max price
+    if (min_price == "" and max_price == ""):
         return True
-    return False
 
+    # Case where no lower bound is given
+    elif (min_price == ""):
+        min_price = sys.float_info.min
+        max_price = float(max_price)
+    # Case where no upper bound is given
+    elif (max_price == ""):
+        max_price = sys.float_info.max
+        min_price = float(min_price)
+    # Case where both bounds are given
+    else:
+        min_price = float(min_price)
+        max_price = float(max_price)
+
+    element = float(element)
+
+    # Sees if price(float) lies between two prices
+    if element >= min_price and element <= max_price:
+        return True
+
+    # Else
+    return False
 
 def get_stats(token, year):
     # return the expense of each month for corresponding year.
@@ -76,4 +124,8 @@ def get_stats(token, year):
 
     return price
 
+if __name__ == "__main__":
+    # print(price_filter("1.0", "0.5", "0.7"))
+    # print(time_filter("2022-03-12", "2022-02-12", "2022-02-12"))
+    pass
 
