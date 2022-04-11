@@ -4,14 +4,19 @@ from datetime import datetime, date
 import sys
 
 
+
 def list_filenames(user_token):
     # returns list of invoice file names belonging to a user
     user_id = decode_token(user_token)['user_id']
     file_names = []
+    new = []
+    paid = []
     raw_list = Database.get_id('Ownership', user_id)
     for item in raw_list:
         file_names.append(f"{user_id}_{item.xml_id}")
-    return {'filenames': file_names}
+        new.append(item.new)
+        paid.append(item.paid)
+    return {'filenames': file_names, 'new':new, 'paid':paid}
 
 
 def list_filter(user_token, sender, min_time, max_time, min_price, max_price):
@@ -36,9 +41,13 @@ def list_filter(user_token, sender, min_time, max_time, min_price, max_price):
                                   filter(lambda item: sender_filter(item.sender, sender), unfiltered_list)))
 
     file_names = []
+    new = []
+    paid = []
     for item in filtered_list:
         file_names.append(f"{user_id}_{item.xml_id}")
-    return {'filenames': file_names}
+        new.append(item.new)
+        paid.append(item.paid)
+    return {'filenames': file_names, 'new':new, 'paid':paid}
 
 
 def sender_filter(element, sender):
@@ -101,8 +110,22 @@ def price_filter(element, min_price, max_price):
     # Else
     return False
 
+def get_stats(token, year):
+    # return the expense of each month for corresponding year.
+    price = [0,0,0,0,0,0,0,0,0,0,0,0]
+    user_id = decode_token(user_token)['user_id']
+    data = Database.get_id('Ownership', user_id)
+    for tup in data:
+        time = tup.time
+        month = int(time.datetime.strftime("%m"))
+        invoice_year = time.datetime.strftime("%Y")
+        if invoice_year == year and month <=12 and month > 0:
+            price[month-1] += tup.price
+
+    return price
 
 if __name__ == "__main__":
     # print(price_filter("1.0", "0.5", "0.7"))
     # print(time_filter("2022-03-12", "2022-02-12", "2022-02-12"))
     pass
+
