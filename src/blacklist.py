@@ -1,7 +1,10 @@
+from posixpath import split
 from src.helper import decode_token
 from src.database import Database
 from src.schema import Blacklist, Login, Senders
 from src.error import InputError
+import os
+import hashlib
 
 # Max number of duplicate/invalid files able to be sent before being blacklisted
 DUPLICATE_LIMIT = 10
@@ -106,9 +109,31 @@ def update_senders_table(user_id, email):
         Senders.create(user_id=user_id, sender_email=email)
 
 
-def is_duplicate(user_id, path_to_xml):
+def is_duplicate(user_id, path_to_sent):
+    # path_to_sent must include "invoices/"
     # Returns True if xml has already been sent to user
-    pass
+    sent_file_size = os.path.getsize(path_to_sent)
+    for invoice_file_name in os.listdir("invoices"):
+        invoice_uid = invoice_file_name.split('_', 1)[0]
+        invoice_size = os.path.getsize(f'invoices/{invoice_file_name}')
+        # If invoice belongs to user and has the same filesize check if duplicate
+        if (user_id == invoice_uid and sent_file_size == invoice_size):
+            while (hash1 := hash_generator(path_to_sent)) == (hash2 := hash_generator(f'invoices/{invoice_file_name}')):
+                # if end of both files reached and hashes are same, return true
+                if (hash1 == None and hash2 == None):
+                    return True
+            # if hashes are different, return false
+            return False
+
+
+def hash_generator(path_to_file):
+    # generates hashes from chunks of files, each chunk is 1024bytes
+    file = open(path_to_file, 'rb')
+    while True:
+        chunk = file.read(1024)
+        if not chunk:
+            return
+        yield hash(chunk)
 
 
 if __name__ == "__main__":
