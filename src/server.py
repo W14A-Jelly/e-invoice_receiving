@@ -181,12 +181,11 @@ def update_password():
 @APP.route("/clear", methods=['DELETE'])
 def data_clear():
     try:
-        assert 'Jelly2022' == request.get_json()['admin_pass']
+        assert "Jelly2022" == request.get_json()['admin_pass']
         clear()
         return {}
     except:
         raise AccessError('Not authorised')
-        return {}
 
 
 @APP.route('/get/stats')
@@ -220,5 +219,4 @@ if __name__ == "__main__":
     Database.start()
     Database.create_tables()
     signal.signal(signal.SIGINT, quit_gracefully)  # For coverage
-    APP.run(host='0.0.0.0', port=config.port,
-            debug=True)  # Do not edit this port\
+    APP.run(host='0.0.0.0', port=config.port)  # Do not edit this port\

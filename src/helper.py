@@ -71,7 +71,6 @@ def is_duplicate(user_id, path_to_sent):
                 generator_2 = hash_generator(f'invoices/{invoice_file_name}')
                 duplicate = True
                 for hash_chunk_1, hash_chunk_2 in zip(generator_1, generator_2):
-                    num_chunks += 1
                     # If two hashes are not the same, break to stop generating hashes
                     # and compare next file. Set duplicate to False.
                     if (hash_chunk_1 != hash_chunk_2):
