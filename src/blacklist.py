@@ -1,11 +1,10 @@
-from multiprocessing.reduction import duplicate
-from posixpath import split
 from src.helper import decode_token
 from src.database import Database
 from src.schema import Blacklist, Login, Senders
 from src.error import InputError
+from time import sleep
 import os
-import hashlib
+
 
 # Max number of duplicate/invalid files able to be sent before being blacklisted
 DUPLICATE_LIMIT = 10
@@ -95,6 +94,15 @@ def increment_invalid_counter(user_id, email):
     sender_row.save()
 
 
+def reset_counters(user_id, email):
+    # Reset invalid and duplicate counters to 0 in senders table
+    sender_row = Senders.get(Senders.user_id == user_id,
+                             Senders.sender_email == email)
+    sender_row.invalid_counter = 0
+    sender_row.duplicate_counter = 0
+    sender_row.save()
+
+
 def is_spam_filter_on(user_id):
     # returns True if user's spam filter is on, false if not
     user_row = Login.get(Login.user_id == user_id)
@@ -110,43 +118,24 @@ def update_senders_table(user_id, email):
         Senders.create(user_id=user_id, sender_email=email)
 
 
-def is_duplicate(user_id, path_to_sent):
-    # Returns True if xml has already been sent to user
-    sent_file_size = os.path.getsize(path_to_sent)
-    for invoice_file_name in os.listdir("invoices"):
-        # Makes sure sent file and README are not considered
-        if (invoice_file_name != path_to_sent.split('/', 1)[1] and invoice_file_name != 'README.txt'):
-            invoice_uid = int(invoice_file_name.split('_', 1)[0])
-            invoice_size = os.path.getsize(f'invoices/{invoice_file_name}')
-            # If invoice belongs to user and has the same filesize check if duplicate
-            if (user_id == invoice_uid and sent_file_size == invoice_size):
-                # Generators for yielding hashes from 1024 byte chunks of files
-                generator_1 = hash_generator(path_to_sent)
-                generator_2 = hash_generator(f'invoices/{invoice_file_name}')
-                duplicate = True
-                for hash_chunk_1, hash_chunk_2 in zip(generator_1, generator_2):
-                    num_chunks += 1
-                    # If two hashes are not the same, break to stop generating hashes
-                    # and compare next file. Set duplicate to False.
-                    if (hash_chunk_1 != hash_chunk_2):
-                        duplicate = False
-                        break
-                # If for loop exits without any two hashes being different (duplicate will
-                # not have been set to False) there exists a duplicate, return True
-                if duplicate == True:
-                    return True
-    # If all files have been read, there are no duplicates, return False
+def check_exceeds_spam_limit(user_id, email):
+    # checks if sender has sent too many duplicate/invalid files
+    sender_row = Senders.get(Senders.user_id == user_id,
+                             Senders.sender_email == email)
+    if (sender_row.invalid_counter >= INVALID_LIMIT or sender_row.duplicate_counter >= DUPLICATE_LIMIT):
+        return True
     return False
 
 
-def hash_generator(path_to_file):
-    # generates hashes from chunks of files, each chunk is 1024bytes
-    file = open(path_to_file, 'rb')
-    while True:
-        chunk = file.read(1024)
-        if not chunk:
-            return
-        yield hash(chunk)
+def time_out_sender(token, email):
+    # Block sender
+    blacklist_add(token, email)
+    # Reset their counters in duplciate tables
+    user_id = decode_token(token)['user_id']
+    reset_counters(user_id, email)
+    # sleep for an hour before unblocking sender
+    sleep(10)
+    blacklist_remove(token, email)
 
 
 if __name__ == "__main__":
@@ -160,7 +149,13 @@ if __name__ == "__main__":
     # increment_duplicate_counter(0, "bb@gmail.com")
     # spam_filter_on('eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjowLCJzZXNzaW9uX2lkIjoiMCJ9.AF1mShROSkSXmVJ_4G7HrewpnQJvokH2DHMzn1HdhzE')
     # spam_filter_off('eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjowLCJzZXNzaW9uX2lkIjoiMCJ9.AF1mShROSkSXmVJ_4G7HrewpnQJvokH2DHMzn1HdhzE')
-    # print(is_duplicate(1, 'invoices/sent.xml'))
+    #update_senders_table(0, "test3@gmail.com")
+    # for i in range(50):
+    #    increment_invalid_counter(0, "test3@gmail.com")
+    #    increment_duplicate_counter(0, "test3@gmail.com")
+    # time_out_sender(
+    #    'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjowLCJzZXNzaW9uX2lkIjoiMCJ9.AF1mShROSkSXmVJ_4G7HrewpnQJvokH2DHMzn1HdhzE', 'test3@gmail.com')
+
     pass
 
     # Check if spam filter is on
