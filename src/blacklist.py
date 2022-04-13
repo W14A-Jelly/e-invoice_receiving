@@ -3,7 +3,10 @@ from src.database import Database
 from src.schema import Blacklist, Login, Senders
 from src.error import InputError
 from time import sleep
-import os
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+import smtplib
+import ssl
 
 
 # Max number of duplicate/invalid files able to be sent before being blacklisted
@@ -134,8 +137,43 @@ def time_out_sender(token, email):
     user_id = decode_token(token)['user_id']
     reset_counters(user_id, email)
     # sleep for an hour before unblocking sender
-    sleep(10)
+    sleep(60*60)
     blacklist_remove(token, email)
+
+
+def send_timeout_email(email_to_recieve, client_email):
+    # Login details of email to send from
+    sender_email = "einvoice.retrieve@gmail.com"
+    password = 'hvxx qjly uoqj owgu'
+
+    # Subject and body of email
+    subject = "Timed Out From Sending XML Invoices To %s" % (client_email)
+    body = ("You have sent too many invalid or duplicate invoices to %s and have been blocked for 1 hour from sending any further invoices.\n"
+            "Please double check that your attatched XML files are correctly formatted and are not duplicates.\n"
+            "If you need to be unblocked immediately, please contact the recipient at: %s\n\n"
+            "Kind Regards,\n\n"
+            "The Jelly Fish Financials Team") % (client_email, client_email)
+
+    # Create a multipart message
+    message = MIMEMultipart()
+    # Headers:
+    message["From"] = sender_email
+    message["To"] = email_to_recieve
+    message["Subject"] = subject
+    # Body (plain text):
+    message.attach(MIMEText(body, "plain"))
+
+    # Convert message to string
+    text = message.as_string()
+
+    # Log in to server using secure context and send email
+    context = ssl.create_default_context()
+    port = 465
+    smtp_server = 'smtp.gmail.com'
+
+    with smtplib.SMTP_SSL(smtp_server, port, context=context) as server:
+        server.login(sender_email, password)
+        server.sendmail(sender_email, email_to_recieve, text)
 
 
 if __name__ == "__main__":
