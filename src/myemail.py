@@ -1,4 +1,6 @@
 from audioop import reverse
+from multiprocessing.reduction import duplicate
+from src import blacklist
 from src.error import InputError, AccessError
 import imaplib
 import base64
@@ -9,11 +11,12 @@ from datetime import datetime, timedelta, timezone
 from imbox import Imbox
 from src import report
 from src.database import Database
-from src.helper import decode_token
+from src.helper import decode_token, validate_xml, is_duplicate
 from lxml import etree
 from email.utils import parsedate_tz, mktime_tz
 import os
 import pytz
+from src.blacklist import *
 
 from bs4 import BeautifulSoup
 from src.render import render_invoice
@@ -79,7 +82,7 @@ def email_retrieve_start(token):
     if is_retrieve == True:
         raise AccessError('There is an active retrieving session already')
     params = [email_address, password, datetime.now(
-        pytz.timezone('Australia/Sydney')).timestamp(), user_id]
+        pytz.timezone('Australia/Sydney')).timestamp(), user_id, token]
     Database.update('Email', user_id, {'is_retrieve': True})
     t = threading.Thread(target=retrival2, args=params)
     t.start()
@@ -140,7 +143,7 @@ def help_check_inbox(email_address, password,timestamp,user_id ):
                         # attatchment type checking
                         if 'xml' in part.get_payload()[1].get_content_type():
                             rp_name =create_new(file_name)
-                            if email_validate_xml(part.get_payload(decode = True)):
+                            if validate_xml(part.get_payload(decode = True)):
                                 try:
                                     fp = open(fp, 'wb')
                                     fp.write(part.get_payload(decode = True))
@@ -162,8 +165,7 @@ def help_check_inbox(email_address, password,timestamp,user_id ):
 '''
 
 
-def retrival2(email_address, password, timestamp, user_id):
-
+def retrival2(email_address, password, timestamp, user_id, token):
     is_retrieve = Database.get_id('Email', user_id)[0].is_retrieve
     while is_retrieve == True:
         host = "imap.gmail.com"
@@ -190,81 +192,74 @@ def retrival2(email_address, password, timestamp, user_id):
             message_time = mktime_tz(parsedate_tz(message.date))
             if timestamp > message_time:
                 break
+            # sender's email
             email = message.sent_from[0]['email']
-            for attachment in message.attachments:
-                if 'xml' in attachment['content-type']:
-                    file_name = attachment['filename']
-                    rp_name = report.create_new(file_name)
-                    data = attachment.get('content').read()
-                    fp = os.path.join(os.getcwd(), 'invoices',
-                                      f"{user_id}_{attachment['filename']}")
+            update_senders_table(user_id, email)
+            # does the user have their spam filter enabled
+            spam_filter = is_spam_filter_on(user_id)
+            # is the sender blacklisted
+            blacklisted = is_blacklisted(user_id, email)
+            if not blacklisted:
+                for attachment in message.attachments:
+                    if 'xml' in attachment['content-type']:
+                        file_name = attachment['filename']
+                        rp_name = report.create_new(file_name)
+                        data = attachment.get('content').read()
+                        fp = os.path.join(os.getcwd(), 'invoices',
+                                          f"{user_id}_{attachment['filename']}")
 
-                    d_successful = False
-                    try:
-                        with open(fp, 'wb') as f:
-                            f.write(data)
+                        d_successful = False
+                        try:
+                            with open(fp, 'wb') as f:
+                                f.write(data)
 
-                        d_successful = True
-                    except:
-                        param = "%s Failed to save" % (attachment['filename'])
-                        report.update_unsuccessful(rp_name, param)
-                        report.email_error_report(
-                            fp, rp_name, email, email_address)
-
-                    if d_successful == True:
-                        valid = email_validate_xml(fp)
-                        if valid == False:
-                            param = "%s Not UBL standard" % (
+                            d_successful = True
+                        except:
+                            param = "%s Failed to save" % (
                                 attachment['filename'])
                             report.update_unsuccessful(rp_name, param)
                             report.email_error_report(
                                 fp, rp_name, email, email_address)
-                            os.remove(fp)
-                        else:
-                            report.update_successful(rp_name)
-                            info = xml_extract(fp)
-                            data = {
-                                'user_id': user_id, 'xml_id': attachment['filename'], 'sender': info['sender'], 'time': info['time'], 'price': info['price']}
-                            Database.insert('Ownership', data)
-                            render_invoice(
-                                f"{user_id}_{attachment['filename']}")
+                        if d_successful == True:
+                            valid = validate_xml(fp)
+                            if valid == False:
+                                param = "%s Not UBL standard" % (
+                                    attachment['filename'])
+                                report.update_unsuccessful(rp_name, param)
+                                report.email_error_report(
+                                    fp, rp_name, email, email_address)
+                                if spam_filter:
+                                    increment_invalid_counter(user_id, email)
+                                    if check_exceeds_spam_limit(user_id, email):
+                                        t = threading.Thread(target=time_out_sender, args=[
+                                            token, email, email_address])
+                                        t.start()
 
-        is_retrieve = Database.get_id('Email', user_id)[0].is_retrieve
+                                os.remove(fp)
+                            elif is_duplicate(user_id, f"invoices/{user_id}_{attachment['filename']}"):
+                                # If we don't want duplicates in database, add here
+                                if spam_filter:
+                                    increment_duplicate_counter(user_id, email)
+                                    if check_exceeds_spam_limit(user_id, email):
+                                        t = threading.Thread(target=time_out_sender, args=[
+                                            token, email, email_address])
+                                        t.start()
+                            else:
+                                report.update_successful(rp_name)
+                                info = xml_extract(fp)
+                                data = {
+                                    'user_id': user_id, 'xml_id': attachment['filename'], 'sender': info['sender'], 'time': info['time'], 'price': info['price']}
+                                Database.insert('Ownership', data)
+                                render_invoice(
+                                    f"{user_id}_{attachment['filename']}")
+            else:
+                print("%s is blacklisted" % (email))
+            is_retrieve = Database.get_id('Email', user_id)[0].is_retrieve
 
 
 '''
                     else:
                         report.update_unsuccessful(rp_name, f'%s Not UBL standard', attachment['filename'])'''
-
-
-def email_validate_xml(path_to_invoice):
-
-    # Validate well-formedness
-    try:
-        invoice_root = etree.parse(path_to_invoice)
-
-    except etree.XMLSyntaxError:
-        return False
-
-    # Validate against schema
-    schema_root = etree.parse('xsd/UBL-Invoice-2.1.xsd')
-    xmlschema = etree.XMLSchema(schema_root)
-    try:
-        xmlschema.assertValid(invoice_root)
-
-    except etree.DocumentInvalid:
-        return False
-
-    # If no exceptions raised, xml is valid
-    return True
-
-
-def email_output_report():
-    # module to email_retrieve_start
-    '''
-    some description
-    '''
-    return {}
 
 
 def email_retrieve_end(token):
@@ -323,4 +318,4 @@ def xml_extract(path_to_file):
 
 
 if __name__ == "__main__":
-    print(email_validate_xml("invoices/example1.xml"))
+    print(validate_xml("invoices/example1.xml"))
