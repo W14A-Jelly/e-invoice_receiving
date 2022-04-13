@@ -130,15 +130,16 @@ def check_exceeds_spam_limit(user_id, email):
     return False
 
 
-def time_out_sender(token, email):
+def time_out_sender(token, sender_email, client_email):
     # Block sender
-    blacklist_add(token, email)
+    blacklist_add(token, sender_email)
     # Reset their counters in duplciate tables
     user_id = decode_token(token)['user_id']
-    reset_counters(user_id, email)
+    reset_counters(user_id, sender_email)
+    send_timeout_email(sender_email, client_email)
     # sleep for an hour before unblocking sender
     sleep(60*60)
-    blacklist_remove(token, email)
+    blacklist_remove(token, sender_email)
 
 
 def send_timeout_email(email_to_recieve, client_email):

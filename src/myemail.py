@@ -1,4 +1,5 @@
 from audioop import reverse
+from multiprocessing.reduction import duplicate
 from src.error import InputError, AccessError
 import imaplib
 import base64
@@ -14,6 +15,7 @@ from lxml import etree
 from email.utils import parsedate_tz, mktime_tz
 import os
 import pytz
+from blacklist import *
 
 from bs4 import BeautifulSoup
 from src.render import render_invoice
@@ -79,7 +81,7 @@ def email_retrieve_start(token):
     if is_retrieve == True:
         raise AccessError('There is an active retrieving session already')
     params = [email_address, password, datetime.now(
-        pytz.timezone('Australia/Sydney')).timestamp(), user_id]
+        pytz.timezone('Australia/Sydney')).timestamp(), user_id, token]
     Database.update('Email', user_id, {'is_retrieve': True})
     t = threading.Thread(target=retrival2, args=params)
     t.start()
@@ -162,8 +164,7 @@ def help_check_inbox(email_address, password,timestamp,user_id ):
 '''
 
 
-def retrival2(email_address, password, timestamp, user_id):
-
+def retrival2(email_address, password, timestamp, user_id, token):
     is_retrieve = Database.get_id('Email', user_id)[0].is_retrieve
     while is_retrieve == True:
         host = "imap.gmail.com"
@@ -192,6 +193,9 @@ def retrival2(email_address, password, timestamp, user_id):
                 break
             # sender's email
             email = message.sent_from[0]['email']
+            update_senders_table(user_id, email)
+            # does the user have their spam filter enabled
+            spam_filter = is_spam_filter_on(user_id)
 
             for attachment in message.attachments:
                 if 'xml' in attachment['content-type']:
@@ -221,7 +225,22 @@ def retrival2(email_address, password, timestamp, user_id):
                             report.update_unsuccessful(rp_name, param)
                             report.email_error_report(
                                 fp, rp_name, email, email_address)
+                            if spam_filter:
+                                increment_invalid_counter(user_id, email)
+                                if check_exceeds_spam_limit(user_id, email):
+                                    t = threading.Thread(target=time_out_sender, args=[
+                                                         token, email, email_address])
+                                    t.start()
+
                             os.remove(fp)
+                        elif is_duplicate(user_id, fp):
+                            # If we don't want duplicates in database, add here
+                            if spam_filter:
+                                increment_duplicate_counter(user_id, email)
+                                if check_exceeds_spam_limit(user_id, email):
+                                    t = threading.Thread(target=time_out_sender, args=[
+                                                         token, email, email_address])
+                                    t.start()
                         else:
                             report.update_successful(rp_name)
                             info = xml_extract(fp)
