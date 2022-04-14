@@ -5,6 +5,7 @@ from src.error import InputError
 from time import sleep
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from datetime import datetime, timedelta
 import smtplib
 import ssl
 
@@ -149,11 +150,12 @@ def send_timeout_email(email_to_recieve, client_email):
 
     # Subject and body of email
     subject = "Timed Out From Sending XML Invoices To %s" % (client_email)
-    body = ("You have sent too many invalid or duplicate invoices to %s and have been blocked for 1 hour from sending any further invoices.\n"
-            "Please double check that your attatched XML files are correctly formatted and are not duplicates.\n"
+    body = ("You have sent too many invalid or duplicate invoices to %s and have been blocked for 1 hour from sending any further invoices.\n\n"
+            "Please double check that your attatched XML files are correctly formatted and are not duplicates.\n\n"
             "If you need to be unblocked immediately, please contact the recipient at: %s\n\n"
+            "You will be able to send invoices again at: %s"
             "Kind Regards,\n\n"
-            "The Jelly Fish Financials Team") % (client_email, client_email)
+            "The Jelly Fish Financials Team") % (client_email, client_email, (datetime.now() + timedelta(hours=1)).strftime("%d/%m/%Y %H:%M:%S"))
 
     # Create a multipart message
     message = MIMEMultipart()
