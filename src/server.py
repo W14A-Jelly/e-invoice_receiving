@@ -9,9 +9,11 @@ from src.clear import clear
 from src.user import user_register, user_login, user_logout, user_update_email, user_update_password
 from src.myemail import email_set, email_retrieve_start, email_retrieve_end
 from src.database import Database
-from src.list import list_filter, list_filenames
+from src.list import list_filter, list_filenames, get_stats
 from src.render import render_invoice
 from src.error import InputError, AccessError
+from src.database import Database
+from src.blacklist import blacklist_add, blacklist_remove, blacklist_list
 
 
 def quit_gracefully(*args):
@@ -31,7 +33,7 @@ def defaultHandler(err):
     return response
 
 
-APP = Flask(__name__, static_url_path= '/static')
+APP = Flask(__name__, static_url_path='/static')
 CORS(APP)
 
 APP.config['TRAP_HTTP_EXCEPTIONS'] = True
@@ -101,10 +103,12 @@ def end_api():
 def filter_invoices():
     token = request.args.get('token')
     sender = request.args.get('sender')
-    time = request.args.get('time')
-    price = request.args.get('price')
+    min_time = request.args.get('min_time')
+    max_time = request.args.get('max_time')
+    min_price = request.args.get('min_price')
+    max_price = request.args.get('max_price')
     filtered_list = list_filter(
-        token, sender, sender, price)
+        token, sender, min_time, max_time, min_price, max_price)
     return dumps(filtered_list)
 
 
@@ -121,6 +125,27 @@ def show_invoice():
     img_file_name = render_invoice(fn)
 
     return dumps({'img': img_file_name})
+
+
+@APP.route("/blacklist/block", methods=['PUT'])
+def block():
+    input = request.get_json
+    blacklist_add(input['token'], input['email'])
+    return ({})
+
+
+@APP.route("/blacklist/unblock", methods=['PUT'])
+def unblock():
+    input = request.get_json
+    blacklist_remove(input['token'], input['email'])
+    return ({})
+
+
+@APP.route("/blacklist/list", methods=['GET'])
+def unblock():
+    token = request.args.get('token')
+    blacklist = blacklist_list(token)
+    return ({'blacklist': blacklist})
 
 
 @APP.route("/user/update/email", methods=['PUT'])
@@ -149,7 +174,11 @@ def data_clear():
         raise AccessError('Not authorised')
         return {}
 
-
+@APP.route('/get/stats')
+def get_statistic():
+    token = request.args.get('token')
+    year = request.args.get('year')
+    return dumps(get_stats(token, year))
 '''
 @APP.route("/invoice/upload", methods=['GET'])
 def upload_xml():
@@ -160,12 +189,19 @@ def upload_xml():
 
     return dumps({"invoice_report": report})
 '''
+
+
 @APP.route('/static/<path:path>')
 def send_js(path):
+    removed_front = path.partition('renders/')[2]
+    file_name = removed_front.partition('.jpg')[0]
+    Database.update_invoice(file_name, {'new':False})
     return send_from_directory('',path)
+
 
 if __name__ == "__main__":
     Database.start()
     Database.create_tables()
     signal.signal(signal.SIGINT, quit_gracefully)  # For coverage
-    APP.run(port=config.port, debug=True)  # Do not edit this port\
+    APP.run(host='0.0.0.0', port=config.port,
+            debug=True)  # Do not edit this port\
