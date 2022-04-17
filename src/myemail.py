@@ -237,7 +237,17 @@ def retrival2(email_address, password, timestamp, user_id, token):
 
                                 os.remove(fp)
                             elif is_duplicate(user_id, f"invoices/{user_id}_{attachment['filename']}"):
-                                # If we don't want duplicates in database, add here
+                                # If duplicate continues as normal, however file name will say duplicate
+                                os.rename(
+                                    f"invoices/{user_id}_{attachment['filename']}", f"invoices/{user_id}_{attachment['filename']}_DUPLICATE")
+                                report.update_successful(rp_name)
+                                info = xml_extract(fp)
+                                data = {
+                                    'user_id': user_id, 'xml_id': f"{attachment['filename']}_DUPLICATE", 'sender': info['sender'], 'time': info['time'], 'price': info['price']}
+                                Database.insert('Ownership', data)
+                                render_invoice(
+                                    f"{user_id}_{attachment['filename']}")
+                                # Duplicate will be processed before user is balacklisted
                                 if spam_filter:
                                     increment_duplicate_counter(user_id, email)
                                     if check_exceeds_spam_limit(user_id, email):
