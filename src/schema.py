@@ -21,7 +21,7 @@ class Login(Entity):
     email = pw.TextField(unique=True)
     password = pw.TextField(constraints=[pw.Check(pass_constraint)])
     session_id = pw.TextField()
-    spam_filter_on = pw.BooleanField(default=True)
+    spam_filter_on = pw.BooleanField(default=False)
 
 
 class Email(Entity):
