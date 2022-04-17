@@ -198,12 +198,3 @@ if __name__ == "__main__":
     #    'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjowLCJzZXNzaW9uX2lkIjoiMCJ9.AF1mShROSkSXmVJ_4G7HrewpnQJvokH2DHMzn1HdhzE', 'test3@gmail.com')
 
     pass
-
-    # Check if spam filter is on
-    # If on, check is sender is blacklisted
-    # If blacklisted, dont process
-    # Check if invalid
-    # If invalid, increment counter
-    # Check if counter greater than max
-    # If greater than max, blacklist, don't process
-    # Repeat check for duplicate
