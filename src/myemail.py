@@ -249,7 +249,7 @@ def retrival2(email_address, password, timestamp, user_id, token):
                                 data = {
                                     'user_id': user_id, 'xml_id': d_file_name, 'sender': info['sender'], 'time': info['time'], 'price': info['price']}
                                 Database.insert('Ownership', data)
-                                render_invoice(f"{user_id}_d_file_name")
+                                render_invoice(f"{user_id}_{d_file_name}")
                                 # Duplicate will be processed before user is balacklisted
                                 if spam_filter:
                                     increment_duplicate_counter(user_id, email)
