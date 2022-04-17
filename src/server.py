@@ -129,14 +129,14 @@ def show_invoice():
 
 @APP.route("/blacklist/block", methods=['PUT'])
 def block():
-    input = request.get_json
+    input = request.get_json()
     blacklist_add(input['token'], input['email'])
     return ({})
 
 
 @APP.route("/blacklist/unblock", methods=['PUT'])
 def unblock():
-    input = request.get_json
+    input = request.get_json()
     blacklist_remove(input['token'], input['email'])
     return ({})
 
