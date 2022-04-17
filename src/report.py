@@ -1,6 +1,7 @@
 import json
 import os
 import glob
+from pprint import pprint
 import smtplib
 import ssl
 import email
@@ -75,20 +76,24 @@ def return_reports():
 def clear_reports():
     reports = glob.glob('reports/*')
     for report in reports:
-        os.remove(report)
+        if report != "README.txt":
+            os.remove(report)
 
 
 def email_error_report(path_to_XML, path_to_report, receiver_email, client_email):
     # Login details of email to send from
     sender_email = "einvoice.retrieve@gmail.com"
-    password = 'tqgj frum fezi kizp'
+    password = 'hvxx qjly uoqj owgu'
+
+    # Read error message from communication report
+    with open(path_to_report, "r") as report:
+        error_message = json.load(report)['error']
 
     # Subject and body of email
     subject = "Error Sending XML Invoice To %s" % (client_email)
-    body = ("The attached error report was generated following your attempt to send an XML invoice to %s.\n"
-            "Please find attached:\n"
-            "1. Error Report\n"
-            "2. Your Invoice\n") % (client_email)
+    body = ("The following error was generated after your attempt to send an XML invoice to %s.\n\n"
+            "\"%s.\"\n\n"
+            "Please find your invoice attatched below:\n") % (client_email, error_message)
 
     # Create a multipart message
     message = MIMEMultipart()
@@ -99,31 +104,19 @@ def email_error_report(path_to_XML, path_to_report, receiver_email, client_email
     # Body (plain text):
     message.attach(MIMEText(body, "plain"))
 
-    # Communication report attatchment
-    with open(path_to_report, "rb") as attachment:
-        report_part = MIMEBase("application", "octet-stream")
-        # Set payload of part as file contents in binary
-        report_part.set_payload(attachment.read())
-    # Convert payload of part to ASCII
-    encoders.encode_base64(report_part)
-    # Add header as key/value pair to attachment part
-    report_part.add_header(
-        "Content-Disposition",
-        f"attachment; filename= {path_to_report}",
-    )
-    # Add attachment to message
-    message.attach(report_part)
-
     # Invoice attatchment
     with open(path_to_XML, "rb") as attachment:
         invoice_part = MIMEBase("application", "octet-stream")
+        # Set payload of part as file contents in binary
         invoice_part.set_payload(attachment.read())
-
+        # Convert payload of part to ASCII
     encoders.encode_base64(invoice_part)
+    # Add header as key/value pair to attachment part
     invoice_part.add_header(
         "Content-Disposition",
         f"attachment; filename= {path_to_XML}",
     )
+    # Add attachment to message
     message.attach(invoice_part)
 
     # Convert message to string
@@ -139,15 +132,19 @@ def email_error_report(path_to_XML, path_to_report, receiver_email, client_email
         server.sendmail(sender_email, receiver_email, text)
 
 
-# if __name__ == "__main__":
-    # report1 = create_new(1)
-    # update_successful(report1)
+if __name__ == "__main__":
+    '''
+    report1 = create_new(1)
+    update_successful(report1)
 
-    # report2 = create_new(2)
-    # update_unsuccessful(report2, 'invalid UBL format')
+    report2 = create_new(2)
+    update_unsuccessful(report2, 'Invalid UBL format')
 
-    # all_reports = return_reports()
-    # print(all_reports)
+    all_reports = return_reports()
+    print(all_reports)
 
-    # clear_reports()
-    # email_error_report("invoices/example.xml", "reports/invoice_1_report.json", 'se2y22g32@gmail.com', "client@gmail.com")
+    email_error_report("invoices/example1.xml", "reports/invoice_2_report.json",
+                       'se2y22g32@gmail.com', "client@gmail.com")
+    clear_reports()
+    '''
+    pass

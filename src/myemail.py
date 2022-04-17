@@ -1,4 +1,6 @@
 from audioop import reverse
+from multiprocessing.reduction import duplicate
+from src import blacklist
 from src.error import InputError, AccessError
 import imaplib
 import base64
@@ -9,18 +11,20 @@ from datetime import datetime, timedelta, timezone
 from imbox import Imbox
 from src import report
 from src.database import Database
-from src.helper import decode_token
+from src.helper import decode_token, validate_xml, is_duplicate
 from lxml import etree
 from email.utils import parsedate_tz, mktime_tz
 import os
 import pytz
+from src.blacklist import *
 
 from bs4 import BeautifulSoup
+from src.render import render_invoice
 
 
 def email_set(token, email_address, email_pass):
     # validate email can be logged into
-    #host = imaplib.IMAP4_SSL("imap.gmail.com")
+    # host = imaplib.IMAP4_SSL("imap.gmail.com")
 
     decode_data = decode_token(token)
     if decode_data == None:
@@ -31,7 +35,7 @@ def email_set(token, email_address, email_pass):
         mail = Imbox(host, username=email_address, password=email_pass,
                      ssl=True, ssl_context=None, starttls=False)
         mail.logout
-        #login_status, acc = mail.login(email_address, email_pass)
+        # login_status, acc = mail.login(email_address, email_pass)
     except:
         raise AccessError(
             'Could not update email, given credentials are invalid')
@@ -78,7 +82,7 @@ def email_retrieve_start(token):
     if is_retrieve == True:
         raise AccessError('There is an active retrieving session already')
     params = [email_address, password, datetime.now(
-        pytz.timezone('Australia/Sydney')).timestamp(), user_id]
+        pytz.timezone('Australia/Sydney')).timestamp(), user_id, token]
     Database.update('Email', user_id, {'is_retrieve': True})
     t = threading.Thread(target=retrival2, args=params)
     t.start()
@@ -87,7 +91,7 @@ def email_retrieve_start(token):
 
 '''
 def help_check_inbox(email_address, password,timestamp,user_id ):
-    #DATABASE select is retrieve from email retrieve where email = email_address
+    # DATABASE select is retrieve from email retrieve where email = email_address
     is_retrieve = Database.get_id('Email', user_id)[0].is_retrieve
     mail = imaplib.IMAP4_SSL("imap.gmail.com")
     login_status, acc = mail.login(email_address, password)
@@ -97,10 +101,10 @@ def help_check_inbox(email_address, password,timestamp,user_id ):
         inbox_status, data = mail.select('Inbox')
         if inbox_status != 'OK':
             raise AccessError("Cannot search inbox")
-        #loop through inboxes
+        # loop through inboxes
         for count,mid in enumerate(data[0].split())
             message_status, msg_info = mail.fetch(mid, '(RFC822)')
-            #m = email.message_from_string(msg_info[0][1])
+            # m = email.message_from_string(msg_info[0][1])
             m = email.message_from_string(msg_info[0][1])
             # Not sure if the keyword need to be Date or Time, need to makeup a gmail for further test
             if n == 0:
@@ -133,12 +137,13 @@ def help_check_inbox(email_address, password,timestamp,user_id ):
 
                 if bool(file_name):
                     # make sure invoice directory is created when the server is running.
-                    fp = os.path.join(os.getcwd(),'invoices', str(user_id),file_name)
+                    fp = os.path.join(os.getcwd(),'invoices',
+                                      str(user_id),file_name)
                     if not os.path.isfile(fp):
                         # attatchment type checking
                         if 'xml' in part.get_payload()[1].get_content_type():
                             rp_name =create_new(file_name)
-                            if email_validate_xml(part.get_payload(decode = True)):
+                            if validate_xml(part.get_payload(decode = True)):
                                 try:
                                     fp = open(fp, 'wb')
                                     fp.write(part.get_payload(decode = True))
@@ -146,11 +151,13 @@ def help_check_inbox(email_address, password,timestamp,user_id ):
                                     report.update_successful(rp_name)
                                     Database.insert('Ownership', {user_id: user_id, xml_id = file_name})
                                 except:
-                                    report.update_unsuccessful(rp_name,'cannot save invoice')
+                                    report.update_unsuccessful(
+                                        rp_name,'cannot save invoice')
                             else:
-                                report.update_unsuccessful(rp_name, 'Not UBL standard')
+                                report.update_unsuccessful(
+                                    rp_name, 'Not UBL standard')
 
-        #sleep(30)                       
+        # sleep(30)
         is_retrieve = Database.get_id('Email', user_id)[0].is_retrieve
 
     mail.close()
@@ -158,8 +165,7 @@ def help_check_inbox(email_address, password,timestamp,user_id ):
 '''
 
 
-def retrival2(email_address, password, timestamp, user_id):
-
+def retrival2(email_address, password, timestamp, user_id, token):
     is_retrieve = Database.get_id('Email', user_id)[0].is_retrieve
     while is_retrieve == True:
         host = "imap.gmail.com"
@@ -186,79 +192,74 @@ def retrival2(email_address, password, timestamp, user_id):
             message_time = mktime_tz(parsedate_tz(message.date))
             if timestamp > message_time:
                 break
-            for attachment in message.attachments:
-                if 'xml' in attachment['content-type']:
-                    file_name = attachment['filename']
-                    rp_name = report.create_new(file_name)
-                    data = attachment.get('content').read()
-                    fp = os.path.join(os.getcwd(), 'invoices',
-                                      f"{user_id}_{attachment['filename']}")
+            # sender's email
+            email = message.sent_from[0]['email']
+            update_senders_table(user_id, email)
+            # does the user have their spam filter enabled
+            spam_filter = is_spam_filter_on(user_id)
+            # is the sender blacklisted
+            blacklisted = is_blacklisted(user_id, email)
+            if not blacklisted:
+                for attachment in message.attachments:
+                    if 'xml' in attachment['content-type']:
+                        file_name = attachment['filename']
+                        rp_name = report.create_new(file_name)
+                        data = attachment.get('content').read()
+                        fp = os.path.join(os.getcwd(), 'invoices',
+                                          f"{user_id}_{attachment['filename']}")
 
-                    d_successful = False
-                    try:
-                        with open(fp, 'wb') as f:
-                            f.write(data)
+                        d_successful = False
+                        try:
+                            with open(fp, 'wb') as f:
+                                f.write(data)
 
-                        d_successful = True
-                    except:
-                        param = f'%s Failed to save', attachment['filename']
-                        report.update_unsuccessful(rp_name, param)
-                        report.email_error_report(
-                            fp, rp_name, "se2y22g32@gmail.com", email_address)
-
-                    if d_successful == True:
-                        valid = email_validate_xml(fp)
-                        if valid == False:
-                            param = f'%s Not UBL standard', attachment['filename']
+                            d_successful = True
+                        except:
+                            param = "%s Failed to save" % (
+                                attachment['filename'])
                             report.update_unsuccessful(rp_name, param)
                             report.email_error_report(
-                                fp, rp_name, "se2y22g32@gmail.com", email_address)
-                            os.remove(fp)
-                        else:
-                            report.update_successful(rp_name)
-                            info = xml_extract(fp)
-                            data = {
-                                'user_id': user_id, 'xml_id': attachment['filename'], 'sender': info['sender'], 'time': info['time'], 'price': info['price']}
-                            Database.insert('Ownership', data)
-                            render_invoice("{user_id}_{attachment['filename']}")
+                                fp, rp_name, email, email_address)
+                        if d_successful == True:
+                            valid = validate_xml(fp)
+                            if valid == False:
+                                param = "%s Not UBL standard" % (
+                                    attachment['filename'])
+                                report.update_unsuccessful(rp_name, param)
+                                report.email_error_report(
+                                    fp, rp_name, email, email_address)
+                                if spam_filter:
+                                    increment_invalid_counter(user_id, email)
+                                    if check_exceeds_spam_limit(user_id, email):
+                                        t = threading.Thread(target=time_out_sender, args=[
+                                            token, email, email_address])
+                                        t.start()
 
-        is_retrieve = Database.get_id('Email', user_id)[0].is_retrieve
+                                os.remove(fp)
+                            elif is_duplicate(user_id, f"invoices/{user_id}_{attachment['filename']}"):
+                                # If we don't want duplicates in database, add here
+                                if spam_filter:
+                                    increment_duplicate_counter(user_id, email)
+                                    if check_exceeds_spam_limit(user_id, email):
+                                        t = threading.Thread(target=time_out_sender, args=[
+                                            token, email, email_address])
+                                        t.start()
+                            else:
+                                report.update_successful(rp_name)
+                                info = xml_extract(fp)
+                                data = {
+                                    'user_id': user_id, 'xml_id': attachment['filename'], 'sender': info['sender'], 'time': info['time'], 'price': info['price']}
+                                Database.insert('Ownership', data)
+                                render_invoice(
+                                    f"{user_id}_{attachment['filename']}")
+            else:
+                print("%s is blacklisted" % (email))
+            is_retrieve = Database.get_id('Email', user_id)[0].is_retrieve
 
 
 '''
                     else:
                         report.update_unsuccessful(rp_name, f'%s Not UBL standard', attachment['filename'])'''
-
-
-def email_validate_xml(path_to_invoice):
-
-    # Validate well-formedness, if invalid remove xml from invoices
-    try:
-        etree.parse(path_to_invoice)
-
-    except etree.XMLSyntaxError:
-        return False
-
-    '''
-    # Validate against schema, if invalid remove xml from invoices
-    schema_root = etree.parse('src/xmlschema.xsl')
-    xmlschema = etree.XMLSchema(schema_root)
-    try:
-        xmlschema.assertValid(invoice_root)
-
-    except etree.DocumentInvalid:
-        os.remove(path_to_invoice)
-        return False
-    '''
-    return True
-
-
-def email_output_report():
-    # module to email_retrieve_start
-    '''
-    some description
-    '''
-    return {}
 
 
 def email_retrieve_end(token):
@@ -314,3 +315,7 @@ def xml_extract(path_to_file):
     price = float(price.contents[0])
 
     return ({'sender': supplier, 'time': datetime_object, 'price': price})
+
+
+if __name__ == "__main__":
+    print(validate_xml("invoices/example1.xml"))
