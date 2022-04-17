@@ -113,7 +113,7 @@ def price_filter(element, min_price, max_price):
 def get_stats(token, year):
     # return the expense of each month for corresponding year.
     price = [0,0,0,0,0,0,0,0,0,0,0,0]
-    user_id = decode_token(user_token)['user_id']
+    user_id = decode_token(token)['user_id']
     data = Database.get_id('Ownership', user_id)
     for tup in data:
         time = tup.time
