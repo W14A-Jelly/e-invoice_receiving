@@ -142,7 +142,7 @@ def unblock():
 
 
 @APP.route("/blacklist/list", methods=['GET'])
-def unblock():
+def blacklist_list():
     token = request.args.get('token')
     blacklist = blacklist_list(token)
     return ({'blacklist': blacklist})
@@ -203,5 +203,4 @@ if __name__ == "__main__":
     Database.start()
     Database.create_tables()
     signal.signal(signal.SIGINT, quit_gracefully)  # For coverage
-    APP.run(host='0.0.0.0', port=config.port,
-            debug=True)  # Do not edit this port\
+    APP.run(host='0.0.0.0', port=config.port)  # Do not edit this port\
