@@ -1,5 +1,5 @@
 from audioop import reverse
-from multiprocessing.reduction import duplicate
+#from multiprocessing.reduction import duplicate
 from src import blacklist
 from src.error import InputError, AccessError
 import imaplib
