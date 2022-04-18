@@ -13,7 +13,8 @@ from src.list import list_filter, list_filenames, get_stats
 from src.render import render_invoice
 from src.error import InputError, AccessError
 from src.database import Database
-from src.blacklist import blacklist_add, blacklist_remove, blacklist_list, spam_filter_off, spam_filter_on
+from src.blacklist import blacklist_add, blacklist_remove, blacklist_list, spam_filter_off, spam_filter_on, is_spam_filter_on
+from helper import decode_token
 
 
 def quit_gracefully(*args):
@@ -160,6 +161,13 @@ def filter_off():
     input = request.get_json
     spam_filter_off(input['token'])
     return ({})
+
+
+@APP.route("/blacklist/spamfilter/status", methods=['GET'])
+def spamfilter_status():
+    token = request.args.get('token')
+    user_id = decode_token(token)['user_id']
+    return ({'status': is_spam_filter_on(user_id)})
 
 
 @APP.route("/user/update/email", methods=['PUT'])
