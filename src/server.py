@@ -220,7 +220,12 @@ def upload_xml():
 def send_js(path):
     removed_front = path.partition('renders/')[2]
     file_name = removed_front.partition('.jpg')[0]
+    print(file_name)
+    print('===')
+    print("Ownership")
     Database.update_invoice(file_name, {'new': False})
+    print_table("Ownership")
+    print('===')
     return send_from_directory('', path)
 
 
