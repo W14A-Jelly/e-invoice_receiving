@@ -14,7 +14,7 @@ from src.render import render_invoice
 from src.error import InputError, AccessError
 from src.database import Database
 from src.blacklist import blacklist_add, blacklist_remove, blacklist_list, spam_filter_off, spam_filter_on, is_spam_filter_on
-from helper import decode_token
+from src.helper import decode_token
 
 
 def quit_gracefully(*args):
