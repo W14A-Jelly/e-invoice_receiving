@@ -151,14 +151,14 @@ def blacklist_list_server():
 
 @APP.route("/blacklist/spamfilter/on", methods=['PUT'])
 def filter_on():
-    input = request.get_json
+    input = request.get_json()
     spam_filter_on(input['token'])
     return ({})
 
 
 @APP.route("/blacklist/spamfilter/off", methods=['PUT'])
 def filter_off():
-    input = request.get_json
+    input = request.get_json()
     spam_filter_off(input['token'])
     return ({})
 
