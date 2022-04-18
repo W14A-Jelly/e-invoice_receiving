@@ -117,8 +117,8 @@ def get_stats(token, year):
     data = Database.get_id('Ownership', user_id)
     for tup in data:
         time = tup.time
-        month = int(time.datetime.strftime("%m"))
-        invoice_year = time.datetime.strftime("%Y")
+        month = int(time.strftime("%m"))
+        invoice_year = time.strftime("%Y")
         if invoice_year == year and month <=12 and month > 0:
             price[month-1] += tup.price
 
