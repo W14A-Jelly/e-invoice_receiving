@@ -166,8 +166,8 @@ def help_check_inbox(email_address, password,timestamp,user_id ):
 
 
 def retrival2(email_address, password, timestamp, user_id, token):
-    is_retrieve = Database.get_id('Email', user_id)[0].is_retrieve
-    while is_retrieve == True:
+    
+    while (Database.get_id('Email', user_id)[0].is_retrieve):
         host = "imap.gmail.com"
         try:
             mail = Imbox(host, username=email_address, password=password,
@@ -267,7 +267,7 @@ def retrival2(email_address, password, timestamp, user_id, token):
                                     f"{user_id}_{attachment['filename']}")
             else:
                 print("%s is blacklisted" % (email))
-            is_retrieve = Database.get_id('Email', user_id)[0].is_retrieve
+            
 
 
 '''
