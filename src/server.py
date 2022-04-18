@@ -142,7 +142,7 @@ def unblock():
 
 
 @APP.route("/blacklist/list", methods=['GET'])
-def blacklist_list():
+def blacklist_list_server():
     token = request.args.get('token')
     blacklist = blacklist_list(token)
     return ({'blacklist': blacklist})
