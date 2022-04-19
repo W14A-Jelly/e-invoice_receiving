@@ -166,7 +166,7 @@ def help_check_inbox(email_address, password,timestamp,user_id ):
 
 
 def retrival2(email_address, password, timestamp, user_id, token):
-    
+
     while (Database.get_id('Email', user_id)[0].is_retrieve):
         host = "imap.gmail.com"
         try:
@@ -238,10 +238,11 @@ def retrival2(email_address, password, timestamp, user_id, token):
                                 os.remove(fp)
                             elif is_duplicate(user_id, f"invoices/{user_id}_{attachment['filename']}"):
                                 # If duplicate continues as normal, however file name will say duplicate
-                                
-                                d_file_name = attachment['filename'].replace(".xml", "_DUPLICATE.xml")
+
+                                d_file_name = attachment['filename'].replace(
+                                    ".xml", "_DUPLICATE.xml")
                                 new_fp = os.path.join(os.getcwd(), 'invoices',
-                                          f"{user_id}_{d_file_name}")
+                                                      f"{user_id}_{d_file_name}")
                                 os.rename(
                                     fp, new_fp)
                                 report.update_successful(rp_name)
@@ -267,7 +268,6 @@ def retrival2(email_address, password, timestamp, user_id, token):
                                     f"{user_id}_{attachment['filename']}")
             else:
                 print("%s is blacklisted" % (email))
-            
 
 
 '''

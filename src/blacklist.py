@@ -10,8 +10,8 @@ import ssl
 
 
 # Max number of duplicate/invalid files able to be sent before being blacklisted
-DUPLICATE_LIMIT = 10
-INVALID_LIMIT = 10
+DUPLICATE_LIMIT = 3
+INVALID_LIMIT = 3
 
 
 def blacklist_add(token, email):
@@ -194,7 +194,7 @@ if __name__ == "__main__":
     #    increment_duplicate_counter(0, "test3@gmail.com")
     # time_out_sender(
     #    'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjowLCJzZXNzaW9uX2lkIjoiMCJ9.AF1mShROSkSXmVJ_4G7HrewpnQJvokH2DHMzn1HdhzE', 'test3@gmail.com')
-
+    increment_duplicate_counter(0, 'se2y22g32@gmail.com')
     pass
 
     # Check if spam filter is on

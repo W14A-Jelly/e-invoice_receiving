@@ -151,14 +151,14 @@ def blacklist_list_server():
 
 @APP.route("/blacklist/spamfilter/on", methods=['PUT'])
 def filter_on():
-    input = request.get_json()
+    input = request.get_json
     spam_filter_on(input['token'])
     return ({})
 
 
 @APP.route("/blacklist/spamfilter/off", methods=['PUT'])
 def filter_off():
-    input = request.get_json()
+    input = request.get_json
     spam_filter_off(input['token'])
     return ({})
 
@@ -220,11 +220,7 @@ def upload_xml():
 def send_js(path):
     removed_front = path.partition('renders/')[2]
     file_name = removed_front.partition('.jpg')[0]
-    file_name = file_name[(1+file_name.find("_")):]
-
     Database.update_invoice(file_name, {'new': False})
-
-
     return send_from_directory('', path)
 
 
