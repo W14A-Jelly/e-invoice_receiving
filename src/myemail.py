@@ -240,7 +240,7 @@ def retrival2(email_address, password, timestamp, user_id, token):
                                 # If duplicate continues as normal, however file name will say duplicate
 
                                 d_file_name = attachment['filename'].replace(
-                                    ".xml", "_DUPLICATE.xml")
+                                    ".xml", ".xml")
                                 new_fp = os.path.join(os.getcwd(), 'invoices',
                                                       f"{user_id}_{d_file_name}")
                                 os.rename(
